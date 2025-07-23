@@ -3,6 +3,9 @@ Library    SeleniumLibrary
 Library    AppiumLibrary
 Library    RequestsLibrary
 Library    String
+Library    Collections
+Library    OperatingSystem
+Library    BuiltIn
 
 # Config Web
 Variables         ${EXECDIR}/Configuration/Web/Configs_Timeout.yml

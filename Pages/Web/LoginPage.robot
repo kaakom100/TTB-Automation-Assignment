@@ -21,7 +21,6 @@ _Set Test Local Variables
     VAR    ${_BTN_PASSWORD}                       ${Xpath.${ENV}.Web.LoginPage.btnPassword}               scope=test   
     VAR    ${_BTN_LOGIN}                          ${Xpath.${ENV}.Web.LoginPage.btnLogin}                  scope=test
     VAR    ${_BTN_INVALID}                        ${Xpath.${ENV}.Web.LoginPage.btnInvalid}                scope=test
-   # VAR    ${_LBL_INVALID}                        ${Xpath.${ENV}.Web.LoginPage.Invalid}                scope=test
 
 Open Web Browser
     [Documentation]    Owner : Danai Lertkamjornwat
@@ -107,33 +106,9 @@ Validate Popup Message
     ${Status}    BuiltIn.Run Keyword And Return Status    SeleniumLibrary.Wait Until Element Is Visible    ${_BTN_INVALID}    ${timeout}       
     IF    ${Status}
         ${Actual}    SeleniumLibrary.Get Text    ${_BTN_INVALID}
-        ${Actual}    Replace String    ${Actual}    ×    ${EMPTY}
-        ${Actual}    Strip String     ${Actual}
-        Should Be Equal    ${Actual}    ${expect}
-    ELSE
-        Fail    msg=Popup Not Found
-    END
-
-Vlidate Success Message
-    [Documentation]    Owner : Danai Lertkamjornwat
-    ...          |     ***| Description |***
-    ...          |     Keyword ตรวจสอบ Vlidate Success Message
-    ...          --------------------------------------------------------------------------
-    ...          |     ***| Optional Parameter |***
-    ...          |     $timeout    : เวลา Wait Element (ค่า default = ${Time_Out.Default})
-    ...          -------------------------------------------------------------------------- 
-    ...          |     ***| Examples of use |***
-    ...          |     Vlidate Success Message    🗂️ ใช้ภายในไฟล์
-    ...          |     LoginSuccessPage.Vlidate Success Message   🌐 ใช้ภายนอกไฟล์
-    ...          ==>  
-    [Setup]    _Set Test Local Variables  
-    [Arguments]    ${expect}    ${timeout}=${Time_Out.Default}     
-    ${Status}    BuiltIn.Run Keyword And Return Status    SeleniumLibrary.Wait Until Element Is Visible    ${_BTN_INVALID}    ${timeout}       
-    IF    ${Status}
-        ${Actual}    SeleniumLibrary.Get Text    ${_BTN_INVALID}
-        ${Actual}    Replace String    ${Actual}    ×    ${EMPTY}
-        ${Actual}    Strip String     ${Actual}
-        Should Be Equal    ${Actual}    ${expect}
+        ${Actual}    String.Replace String    ${Actual}    ×    ${EMPTY}
+        ${Actual}    String.Strip String     ${Actual}
+        BuiltIn.Should Be Equal    ${Actual}    ${expect}
     ELSE
         Fail    msg=Popup Not Found
     END

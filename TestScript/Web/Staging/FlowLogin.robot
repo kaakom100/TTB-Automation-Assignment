@@ -5,9 +5,6 @@ Resource    ${EXECDIR}/Pages/Web/LoginSuccessPage.robot
 Suite Teardown    Close Browser
 
 *** Variables ***
-# Language Config
-${_LANGUAGE_CONFIG}               ${Language}
-
 # Data Test    
 ${_URL}                           https://the-internet.herokuapp.com/login  
 ${_BROWSER}                       chrome
@@ -62,10 +59,10 @@ Login Username Not Found
     ...           |    ***| Expected Result |***
     ...           |    ต้องเข้าสู่ระบบได้ถูกต้อง
     ...           ==> 
-    [Tags]    succes
+    [Tags]    fail
     LoginPage.Open Web Browser    url=${_URL}    browser=${_BROWSER}
-    LoginPage.Input Username Button    username=${_USERNAME_FAIL}
-    LoginPage.Input Password Button    password=${_PASSWORD}
+    LoginPage.Input Username    username=${_USERNAME_FAIL}
+    LoginPage.Input Password    password=${_PASSWORD}
     LoginPage.Click Login Button
     LoginPage.Validate Popup Message    expect=${_USERNAME_ERROR_TEXT}
 
@@ -85,11 +82,11 @@ Login Password Not Found
     ...           |    ***| Expected Result |***
     ...           |    ต้องเข้าสู่ระบบได้ถูกต้อง
     ...           ==> 
-    [Tags]    succes
+    [Tags]    fail
     LoginPage.Open Web Browser    url=${_URL}    browser=${_BROWSER}
-    LoginPage.Input Username Button    username=${_USERNAME}
-    LoginPage.Input Password Button    password=${_PASSWORD_FAIL}
-    LoginPage.Click Login Button    
+    LoginPage.Input Username    username=${_USERNAME}
+    LoginPage.Input Password    password=${_PASSWORD_FAIL}
+    LoginPage.Click Login Button
     LoginPage.Validate Popup Message   expect=${_PASSWORD_ERROR_TEXT}
 
 
