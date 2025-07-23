@@ -1,0 +1,13 @@
+Xpath:
+  Staging:
+    Web:
+      LoginPage:
+        btnUsername: xpath=//*[@id="username"] #ปุ่ม Username
+        btnPassword: xpath=//*[@id="password"] #ปุ่ม Password
+        btnLogin: xpath=//button[@type='submit']  #ปุ่ม Login
+        btnInvalid: xpath=//*[@id="flash"]  #ข้อความ "Your password is invalid!" หรือ "Your username is invalid!"
+      LoginSuccessPage:
+        btnInvalid: xpath=//*[@id="flash"]  #ข้อความ "You logged into a secure area!"
+        btnLogout: xpath=//a[@href='/logout']
+
+  Production:

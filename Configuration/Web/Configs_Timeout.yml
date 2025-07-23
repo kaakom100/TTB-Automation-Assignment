@@ -1,0 +1,13 @@
+Time_Out:
+  Return_Status: 3
+  Return_Status_Quick: 1
+  Return_Status_Medium: 10
+  Default: 15
+  Medium: 30
+  Long: 60
+  Ultra_Long: 120
+  Maximum: 300
+  
+Limit_While_Loop:
+  Round_Default: 100
+  Time_Out_Default: 300
