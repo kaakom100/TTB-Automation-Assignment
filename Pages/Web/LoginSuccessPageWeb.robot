@@ -1,6 +1,6 @@
 *** Settings ***
 Resource    ${EXECDIR}/Configuration/AllResource.robot
-Documentation     `List Keyword in LoginPage for to used`
+Documentation     `List Keyword in LoginSuccessPageWeb for to used`
 ...                Validate : |Validate Popup Message|
 ...                Click    : |Click Login Button|
 
@@ -9,20 +9,23 @@ _Set Test Local Variables
     [Documentation]    เตรียมตัวแปรสำหรับใช้งานในแต่ละ Keywords
     [Tags]    robot:private
     # Timeout
-    VAR    ${_TIMEOUT_RETURN_STATUS}              ${Time_Out.Return_Status}                               scope=test            
-    VAR    ${_TIMEOUT_RETURN_STATUS_MEDIUM}       ${Time_Out.Return_Status_Medium}                        scope=test
-    VAR    ${_TIMEOUT_RETURN_STATUS_QUICK}        ${Time_Out.Return_Status_Quick}                         scope=test
-    VAR    ${_TIMEOUT_LONG}                       ${Time_Out.Long}                                        scope=test
-    VAR    ${_TIMEOUT_DEFAULT}                    ${Time_Out.Default}                                     scope=test
+    VAR    ${_TIMEOUT_RETURN_STATUS}              ${Time_Out.Return_Status}                                     scope=test            
+    VAR    ${_TIMEOUT_RETURN_STATUS_MEDIUM}       ${Time_Out.Return_Status_Medium}                              scope=test
+    VAR    ${_TIMEOUT_RETURN_STATUS_QUICK}        ${Time_Out.Return_Status_Quick}                               scope=test
+    VAR    ${_TIMEOUT_LONG}                       ${Time_Out.Long}                                              scope=test
+    VAR    ${_TIMEOUT_DEFAULT}                    ${Time_Out.Default}                                           scope=test
     # Locator
-    VAR    ${_BTN_LOGOUT}                         ${Xpath.${ENV}.Web.LoginSuccessPage.btnLogout}          scope=test
-    VAR    ${_BTN_INVALID}                        ${Xpath.${ENV}.Web.LoginSuccessPage.btnInvalid}         scope=test
+    VAR    ${_BTN_LOGOUT}                         ${Xpath.${ENV}.${Device}.LoginSuccessPage.btnLogout}          scope=test
+    VAR    ${_BTN_INVALID}                        ${Xpath.${ENV}.${Device}.LoginSuccessPage.btnInvalid}         scope=test
 
 Validate Popup Message
     [Documentation]    Owner : Danai Lertkamjornwat
     ...          |     ***| Description |***
     ...          |     Keyword ตรวจสอบ Validate Popup Message
     ...          --------------------------------------------------------------------------
+    ...          |     ***| Required Parameter |***
+    ...          |     $expect     : ข้อความที่จะ Validate
+    ...          -------------------------------------------------------------------------- 
     ...          |     ***| Optional Parameter |***
     ...          |     $timeout    : เวลา Wait Element (ค่า default = ${Time_Out.Default})
     ...          -------------------------------------------------------------------------- 
@@ -62,5 +65,3 @@ Click Logout Button
     ELSE
         Fail    msg=Button Not Found
     END
-
-

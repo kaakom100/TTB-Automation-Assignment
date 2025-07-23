@@ -11,16 +11,16 @@ _Set Test Local Variables
     [Documentation]    เตรียมตัวแปรสำหรับใช้งานในแต่ละ Keywords
     [Tags]    robot:private
     # Timeout
-    VAR    ${_TIMEOUT_RETURN_STATUS}              ${Time_Out.Return_Status}                               scope=test            
-    VAR    ${_TIMEOUT_RETURN_STATUS_MEDIUM}       ${Time_Out.Return_Status_Medium}                        scope=test
-    VAR    ${_TIMEOUT_RETURN_STATUS_QUICK}        ${Time_Out.Return_Status_Quick}                         scope=test
-    VAR    ${_TIMEOUT_LONG}                       ${Time_Out.Long}                                        scope=test
-    VAR    ${_TIMEOUT_DEFAULT}                    ${Time_Out.Default}                                     scope=test
+    VAR    ${_TIMEOUT_RETURN_STATUS}              ${Time_Out.Return_Status}                                     scope=test            
+    VAR    ${_TIMEOUT_RETURN_STATUS_MEDIUM}       ${Time_Out.Return_Status_Medium}                              scope=test
+    VAR    ${_TIMEOUT_RETURN_STATUS_QUICK}        ${Time_Out.Return_Status_Quick}                               scope=test
+    VAR    ${_TIMEOUT_LONG}                       ${Time_Out.Long}                                              scope=test
+    VAR    ${_TIMEOUT_DEFAULT}                    ${Time_Out.Default}                                           scope=test
     # Locator
-    VAR    ${_BTN_USERNAME}                       ${Xpath.${ENV}.Web.LoginPage.btnUsername}               scope=test
-    VAR    ${_BTN_PASSWORD}                       ${Xpath.${ENV}.Web.LoginPage.btnPassword}               scope=test   
-    VAR    ${_BTN_LOGIN}                          ${Xpath.${ENV}.Web.LoginPage.btnLogin}                  scope=test
-    VAR    ${_BTN_INVALID}                        ${Xpath.${ENV}.Web.LoginPage.btnInvalid}                scope=test
+    VAR    ${_BTN_USERNAME}                       ${Xpath.${ENV}.${Device}.LoginPage.btnUsername}               scope=test
+    VAR    ${_BTN_PASSWORD}                       ${Xpath.${ENV}.${Device}.LoginPage.btnPassword}               scope=test   
+    VAR    ${_BTN_LOGIN}                          ${Xpath.${ENV}.${Device}.LoginPage.btnLogin}                  scope=test
+    VAR    ${_BTN_INVALID}                        ${Xpath.${ENV}.${Device}.LoginPage.btnInvalid}                scope=test
 
 Open Web Browser
     [Documentation]    Owner : Danai Lertkamjornwat
@@ -94,6 +94,9 @@ Validate Popup Message
     ...          |     ***| Description |***
     ...          |     Keyword ตรวจสอบ Validate Popup Message
     ...          --------------------------------------------------------------------------
+    ...          |     ***| Required Parameter |***
+    ...          |     $expect     : ข้อความที่จะ Validate
+    ...          -------------------------------------------------------------------------- 
     ...          |     ***| Optional Parameter |***
     ...          |     $timeout    : เวลา Wait Element (ค่า default = ${Time_Out.Default})
     ...          -------------------------------------------------------------------------- 

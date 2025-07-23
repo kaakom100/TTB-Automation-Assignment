@@ -1,2 +1,0 @@
-ENV: Staging  # [Staging, Production]
-Language: EN  # [TH, EN, KM, MY]

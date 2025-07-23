@@ -1,7 +1,7 @@
 *** Settings ***
 # Page
-Resource    ${EXECDIR}/Pages/Web/LoginPage.robot
-Resource    ${EXECDIR}/Pages/Web/LoginSuccessPage.robot
+Resource    ${EXECDIR}/Pages/Web/LoginPageWeb.robot
+Resource    ${EXECDIR}/Pages/Web/LoginSuccessPageWeb.robot
 Suite Teardown    Close Browser
 
 *** Variables ***
@@ -24,7 +24,7 @@ Login Success
     ...           |    ตรวจสอบเข้าสู่ระบบสำเร็จ
     ...           --------------------------------------------------------------------------
     ...           |    ***| Test Step |***
-    ...           |    1. เปิดแอปพลิเคชัน myAIS
+    ...           |    1. เปิดเว็บไซต์
     ...           |    2. ระบุ Username
     ...           |    3. ระบุ Password
     ...           |    4. คลิกปุ่ม Login
@@ -34,14 +34,14 @@ Login Success
     ...           |    ***| Expected Result |***
     ...           |    ต้องเข้าสู่ระบบได้ถูกต้อง
     ...           ==> 
-    [Tags]    succes
-    LoginPage.Open Web Browser    url=${_URL}    browser=${_BROWSER}
-    LoginPage.Input Username    username=${_USERNAME}
-    LoginPage.Input Password    password=${_PASSWORD}
-    LoginPage.Click Login Button
-    LoginSuccessPage.Validate Popup Message    expect=${_LOGIN_SUCCESS_TEXT}
-    LoginSuccessPage.Click Logout Button
-    LoginPage.Validate Popup Message    expect=${_LOGOUT_SUCCESS_TEXT}
+    [Tags]    success
+    LoginPageWeb.Open Web Browser    url=${_URL}    browser=${_BROWSER}
+    LoginPageWeb.Input Username    username=${_USERNAME}
+    LoginPageWeb.Input Password    password=${_PASSWORD}
+    LoginPageWeb.Click Login Button
+    LoginSuccessPageWeb.Validate Popup Message    expect=${_LOGIN_SUCCESS_TEXT}
+    LoginSuccessPageWeb.Click Logout Button
+    LoginPageWeb.Validate Popup Message    expect=${_LOGOUT_SUCCESS_TEXT}
 
 Login Username Not Found
     [Documentation]    Owner : Danai Lertkamjornwat
@@ -49,7 +49,7 @@ Login Username Not Found
     ...           |    ตรวจสอบเข้าสู่ระบบไม่สำเร็จกรณีระบุ Username ผิด
     ...           --------------------------------------------------------------------------
     ...           |    ***| Test Step |***
-    ...           |    1. เปิดแอปพลิเคชัน myAIS
+    ...           |    1. เปิดเว็บไซต์
     ...           |    2. ระบุ Username
     ...           |    3. ระบุ Password
     ...           |    4. คลิกปุ่ม Login
@@ -60,11 +60,11 @@ Login Username Not Found
     ...           |    ต้องเข้าสู่ระบบได้ถูกต้อง
     ...           ==> 
     [Tags]    fail
-    LoginPage.Open Web Browser    url=${_URL}    browser=${_BROWSER}
-    LoginPage.Input Username    username=${_USERNAME_FAIL}
-    LoginPage.Input Password    password=${_PASSWORD}
-    LoginPage.Click Login Button
-    LoginPage.Validate Popup Message    expect=${_USERNAME_ERROR_TEXT}
+    LoginPageWeb.Open Web Browser    url=${_URL}    browser=${_BROWSER}
+    LoginPageWeb.Input Username    username=${_USERNAME_FAIL}
+    LoginPageWeb.Input Password    password=${_PASSWORD}
+    LoginPageWeb.Click Login Button
+    LoginPageWeb.Validate Popup Message    expect=${_USERNAME_ERROR_TEXT}
 
 Login Password Not Found
     [Documentation]    Owner : Danai Lertkamjornwat
@@ -72,7 +72,7 @@ Login Password Not Found
     ...           |    ตรวจสอบเข้าสู่ระบบไม่สำเร็จกรณีระบุ Password ผิด
     ...           --------------------------------------------------------------------------
     ...           |    ***| Test Step |***
-    ...           |    1. เปิดแอปพลิเคชัน myAIS
+    ...           |    1. เปิดเว็บไซต์
     ...           |    2. ระบุ Username
     ...           |    3. ระบุ Password
     ...           |    4. คลิกปุ่ม Login
@@ -83,10 +83,10 @@ Login Password Not Found
     ...           |    ต้องเข้าสู่ระบบได้ถูกต้อง
     ...           ==> 
     [Tags]    fail
-    LoginPage.Open Web Browser    url=${_URL}    browser=${_BROWSER}
-    LoginPage.Input Username    username=${_USERNAME}
-    LoginPage.Input Password    password=${_PASSWORD_FAIL}
-    LoginPage.Click Login Button
-    LoginPage.Validate Popup Message   expect=${_PASSWORD_ERROR_TEXT}
+    LoginPageWeb.Open Web Browser    url=${_URL}    browser=${_BROWSER}
+    LoginPageWeb.Input Username    username=${_USERNAME}
+    LoginPageWeb.Input Password    password=${_PASSWORD_FAIL}
+    LoginPageWeb.Click Login Button
+    LoginPageWeb.Validate Popup Message   expect=${_PASSWORD_ERROR_TEXT}
 
 

@@ -1,0 +1,45 @@
+Xpath:
+  Staging:
+    Web:
+      LoginPage:
+        btnUsername: xpath=//*[@id="username"] #ปุ่ม Username
+        btnPassword: xpath=//*[@id="password"] #ปุ่ม Password
+        btnLogin: xpath=//button[@type='submit']  #ปุ่ม Login
+        btnInvalid: xpath=//*[@id="flash"]  #ข้อความ "Your password is invalid!" หรือ "Your username is invalid!"
+      LoginSuccessPage:
+        btnInvalid: xpath=//*[@id="flash"]  #ข้อความ "You logged into a secure area!"
+        btnLogout: xpath=//a[@href='/logout']
+    Mobile:
+      MinimalPage:
+        btnAddItem: xpath=//android.widget.ImageView[@resource-id="com.avjindersinghsekhon.minimaltodo:id/addToDoItemFAB"] #ปุ่มเพิ่มข้อมูล 
+        btnOption: xpath=//android.widget.ImageView[@content-desc="More options"] #ปุ่ม Option
+        btnSetting: xpath=//android.widget.TextView[@resource-id="com.avjindersinghsekhon.minimaltodo:id/title" and @text="Settings"] #ปุ่มตั้งค่า
+        btnAbout: xpath=//android.widget.TextView[@resource-id="com.avjindersinghsekhon.minimaltodo:id/title" and @text="About"]  #ปุ่ม About
+        btnItem: xpath=//android.widget.LinearLayout[@resource-id="com.avjindersinghsekhon.minimaltodo:id/listItemLinearLayout"]  #คลิกที่ Item
+      AddItemPage:
+        btnTitle: xpath=//android.widget.EditText[@resource-id="com.avjindersinghsekhon.minimaltodo:id/userToDoEditText"] #ช่องระบุข้อความของ Title
+        btnSumbit: xpath=//android.widget.ImageView[@resource-id="com.avjindersinghsekhon.minimaltodo:id/makeToDoFloatingActionButton"] #ไอคอนรูปจรวจ
+        btnRemindMe: xpath=//android.widget.Switch[@resource-id="com.avjindersinghsekhon.minimaltodo:id/toDoHasDateSwitchCompat"] #ปุ่มเปิดปิดการตั้งเวลา
+        btnDate: xpath=//android.widget.EditText[@resource-id="com.avjindersinghsekhon.minimaltodo:id/newTodoDateEditText"]  #ปุ่มเลือกวัน
+        btnTime: xpath=//android.widget.EditText[@resource-id="com.avjindersinghsekhon.minimaltodo:id/newTodoTimeEditText"] #ปุ่มเวลา
+        btnClose: xpath=//android.widget.ImageButton[@content-desc="Navigate up"] #ปุ่มกากบาท
+        PopupDatePage:
+          btnOK: xpath=//android.widget.Button[@resource-id="com.avjindersinghsekhon.minimaltodo:id/ok"]  #ปุ่มโอเค
+          btnCancel: xpath=//android.widget.Button[@resource-id="com.avjindersinghsekhon.minimaltodo:id/cancel"]  #ปุ่มCancel
+        PopupTimePage:  
+          btnOK: xpath=//android.widget.Button[@resource-id="com.avjindersinghsekhon.minimaltodo:id/ok"]  #ปุ่มโอเค
+          btnCancel: xpath=//android.widget.Button[@resource-id="com.avjindersinghsekhon.minimaltodo:id/cancel"]  #ปุ่มCancel
+          btnSwitchTime: xpath=//android.widget.TextView[@resource-id="com.avjindersinghsekhon.minimaltodo:id/ampm_label"]  #ปุ่มสลับ AM/PM
+      SettingPage:
+        btnBack: xpath=//android.widget.ImageButton[@content-desc="Navigate up"]  #ปุ่มย้อนกลับ
+        btnSwitchMode: xpath=//android.widget.CheckBox[@resource-id="android:id/checkbox"]  #ปุ่มสลับโหมด สว่างหรือมืด
+      AboutPage:
+        btnBack: xpath=//android.widget.ImageButton[@content-desc="Navigate up"]  #ปุ่มย้อนกลับ
+
+
+
+
+
+
+
+  Production:

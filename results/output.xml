@@ -1,87 +1,576 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.2.2 (Python 3.12.4 on win32)" generated="2025-07-23T18:55:18.248830" rpa="false" schemaversion="5">
+<robot generator="Robot 7.2.2 (Python 3.12.4 on win32)" generated="2025-07-24T02:47:27.676228" rpa="false" schemaversion="5">
 <suite id="s1" name="TTB-Automation-Assignment" source="C:\Users\kaako\Documents\Test\TTB_Automation_Assignment\TTB-Automation-Assignment">
 <suite id="s1-s1" name="TestScript" source="C:\Users\kaako\Documents\Test\TTB_Automation_Assignment\TTB-Automation-Assignment\TestScript">
-<suite id="s1-s1-s1" name="API" source="C:\Users\kaako\Documents\Test\TTB_Automation_Assignment\TTB-Automation-Assignment\TestScript\API">
-<suite id="s1-s1-s1-s1" name="API" source="C:\Users\kaako\Documents\Test\TTB_Automation_Assignment\TTB-Automation-Assignment\TestScript\API\API.robot">
-<test id="s1-s1-s1-s1-t1" name="Get User Profile Not Found" line="33">
-<kw name="Create Session" owner="RequestsLibrary">
-<msg time="2025-07-23T18:55:18.714699" level="INFO">Creating Session using : alias=api_session, url=https://reqres.in/api, headers={'x-api-key': 'reqres-free-v1'},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
-<arg>${_SESSION}</arg>
-<arg>${_BASE_URL}</arg>
-<arg>headers={"x-api-key": "${_API_KEY}"}</arg>
-<doc>Create Session: create a HTTP session to a server</doc>
-<status status="PASS" start="2025-07-23T18:55:18.713734" elapsed="0.000965"/>
+<suite id="s1-s1-s1" name="Web" source="C:\Users\kaako\Documents\Test\TTB_Automation_Assignment\TTB-Automation-Assignment\TestScript\Web">
+<suite id="s1-s1-s1-s1" name="Staging" source="C:\Users\kaako\Documents\Test\TTB_Automation_Assignment\TTB-Automation-Assignment\TestScript\Web\Staging">
+<suite id="s1-s1-s1-s1-s1" name="FlowLogin" source="C:\Users\kaako\Documents\Test\TTB_Automation_Assignment\TTB-Automation-Assignment\TestScript\Web\Staging\FlowLogin.robot">
+<test id="s1-s1-s1-s1-s1-t1" name="Login Username Not Found" line="46">
+<kw name="Open Web Browser" owner="LoginPageWeb">
+<kw name="_Set Test Local Variables" owner="LoginPageWeb" type="SETUP">
+<variable name="${_TIMEOUT_RETURN_STATUS}" scope="test">
+<msg time="2025-07-24T02:47:28.155882" level="INFO">${_TIMEOUT_RETURN_STATUS} = 3</msg>
+<var>${Time_Out.Return_Status}</var>
+<status status="PASS" start="2025-07-24T02:47:28.154325" elapsed="0.001557"/>
+</variable>
+<variable name="${_TIMEOUT_RETURN_STATUS_MEDIUM}" scope="test">
+<msg time="2025-07-24T02:47:28.155882" level="INFO">${_TIMEOUT_RETURN_STATUS_MEDIUM} = 10</msg>
+<var>${Time_Out.Return_Status_Medium}</var>
+<status status="PASS" start="2025-07-24T02:47:28.155882" elapsed="0.000000"/>
+</variable>
+<variable name="${_TIMEOUT_RETURN_STATUS_QUICK}" scope="test">
+<msg time="2025-07-24T02:47:28.156887" level="INFO">${_TIMEOUT_RETURN_STATUS_QUICK} = 1</msg>
+<var>${Time_Out.Return_Status_Quick}</var>
+<status status="PASS" start="2025-07-24T02:47:28.155882" elapsed="0.001005"/>
+</variable>
+<variable name="${_TIMEOUT_LONG}" scope="test">
+<msg time="2025-07-24T02:47:28.157928" level="INFO">${_TIMEOUT_LONG} = 60</msg>
+<var>${Time_Out.Long}</var>
+<status status="PASS" start="2025-07-24T02:47:28.156887" elapsed="0.001041"/>
+</variable>
+<variable name="${_TIMEOUT_DEFAULT}" scope="test">
+<msg time="2025-07-24T02:47:28.157928" level="INFO">${_TIMEOUT_DEFAULT} = 15</msg>
+<var>${Time_Out.Default}</var>
+<status status="PASS" start="2025-07-24T02:47:28.157928" elapsed="0.000000"/>
+</variable>
+<variable name="${_BTN_USERNAME}" scope="test">
+<msg time="2025-07-24T02:47:28.158887" level="INFO">${_BTN_USERNAME} = xpath=//*[@id="username"]</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnUsername}</var>
+<status status="PASS" start="2025-07-24T02:47:28.157928" elapsed="0.000959"/>
+</variable>
+<variable name="${_BTN_PASSWORD}" scope="test">
+<msg time="2025-07-24T02:47:28.159888" level="INFO">${_BTN_PASSWORD} = xpath=//*[@id="password"]</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnPassword}</var>
+<status status="PASS" start="2025-07-24T02:47:28.158887" elapsed="0.001001"/>
+</variable>
+<variable name="${_BTN_LOGIN}" scope="test">
+<msg time="2025-07-24T02:47:28.160887" level="INFO">${_BTN_LOGIN} = xpath=//button[@type='submit']</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnLogin}</var>
+<status status="PASS" start="2025-07-24T02:47:28.159888" elapsed="0.000999"/>
+</variable>
+<variable name="${_BTN_INVALID}" scope="test">
+<msg time="2025-07-24T02:47:28.161888" level="INFO">${_BTN_INVALID} = xpath=//*[@id="flash"]</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnInvalid}</var>
+<status status="PASS" start="2025-07-24T02:47:28.160887" elapsed="0.001001"/>
+</variable>
+<tag>robot:private</tag>
+<doc>เตรียมตัวแปรสำหรับใช้งานในแต่ละ Keywords</doc>
+<status status="PASS" start="2025-07-24T02:47:28.154325" elapsed="0.007563"/>
 </kw>
-<kw name="GET On Session" owner="RequestsLibrary">
-<msg time="2025-07-23T18:55:18.858516" level="INFO">GET Request : url=https://reqres.in/api/users/1234 
- path_url=/api/users/1234 
- headers={'User-Agent': 'python-requests/2.32.3', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'x-api-key': 'reqres-free-v1'} 
- body=None 
- </msg>
-<msg time="2025-07-23T18:55:18.859515" level="INFO">GET Response : url=https://reqres.in/api/users/1234 
- status=404, reason=Not Found 
- headers={'Date': 'Wed, 23 Jul 2025 11:55:20 GMT', 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '2', 'Connection': 'keep-alive', 'CF-RAY': '963afcfaec4dce75-SIN', 'Access-Control-Allow-Origin': '*', 'Etag': 'W/"2-vyGp6PvFo4RvsFtPoIWeCReyIC8"', 'Nel': '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}', 'Ratelimit-Limit': '100', 'Ratelimit-Policy': '100;w=60', 'Ratelimit-Remaining': '98', 'Ratelimit-Reset': '60', 'Referrer-Policy': 'strict-origin-when-cross-origin', 'Report-To': '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=%2F76fDBoLgiCt2qp1MsLObVAjTovjaN3dkUZWgielvwQ%3D\\u0026sid=c4c9725f-1ab0-44d8-820f-430df2718e11\\u0026ts=1753271666"}],"max_age":3600}', 'Reporting-Endpoints': 'heroku-nel="https://nel.heroku.com/reports?s=%2F76fDBoLgiCt2qp1MsLObVAjTovjaN3dkUZWgielvwQ%3D&amp;sid=c4c9725f-1ab0-44d8-820f-430df2718e11&amp;ts=1753271666"', 'Via': '1.1 heroku-router', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'X-Request-Id': 'c35f857c-b6ba-4442-791d-5b10db302147', 'X-Xss-Protection': '1; mode=block', 'Age': '53', 'Cache-Control': 'max-age=14400', 'cf-cache-status': 'HIT', 'Vary': 'Accept-Encoding', 'Server': 'cloudflare', 'server-timing': 'cfL4;desc="?proto=TCP&amp;rtt=30255&amp;min_rtt=30244&amp;rtt_var=11364&amp;sent=5&amp;recv=6&amp;lost=0&amp;retrans=0&amp;sent_bytes=2833&amp;recv_bytes=800&amp;delivery_rate=134502&amp;cwnd=252&amp;unsent_bytes=0&amp;cid=2c201f6565334d49&amp;ts=62&amp;x=0"'} 
- body={} 
- </msg>
-<msg time="2025-07-23T18:55:18.859515" level="INFO">C:\Users\kaako\AppData\Local\Programs\Python\Python312\Lib\site-packages\urllib3\connectionpool.py:1097: InsecureRequestWarning: Unverified HTTPS request is being made to host 'reqres.in'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
-  warnings.warn(</msg>
-<msg time="2025-07-23T18:55:18.860514" level="INFO">${response} = &lt;Response [404]&gt;</msg>
-<var>${response}</var>
-<arg>${_SESSION}</arg>
-<arg>/users/1234</arg>
-<arg>expected_status=any</arg>
-<doc>Sends a GET request on a previously created HTTP Session.</doc>
-<status status="PASS" start="2025-07-23T18:55:18.715730" elapsed="0.144784"/>
+<kw name="Convert To Lower Case" owner="String">
+<msg time="2025-07-24T02:47:28.161888" level="INFO">${browser_lower} = chrome</msg>
+<var>${browser_lower}</var>
+<arg>${browser}</arg>
+<doc>Converts string to lower case.</doc>
+<status status="PASS" start="2025-07-24T02:47:28.161888" elapsed="0.000999"/>
 </kw>
-<kw name="Should Be Equal As Integers" owner="BuiltIn">
-<msg time="2025-07-23T18:55:18.862515" level="INFO">Argument types are:
-&lt;class 'int'&gt;
-&lt;class 'str'&gt;</msg>
-<arg>${response.status_code}</arg>
-<arg>404</arg>
-<doc>Fails if objects are unequal after converting them to integers.</doc>
-<status status="PASS" start="2025-07-23T18:55:18.861514" elapsed="0.001001"/>
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2025-07-24T02:47:28.163889" level="INFO">Opening browser 'chrome' to base url 'https://the-internet.herokuapp.com/login'.</msg>
+<arg>url=${url}</arg>
+<arg>browser=${browser_lower}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2025-07-24T02:47:28.162887" elapsed="7.974418"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2025-07-24T02:47:36.138304" elapsed="0.035917"/>
+</kw>
+<arg>url=${_URL}</arg>
+<arg>browser=${_BROWSER}</arg>
+<doc>Owner : Danai Lertkamjornwat
+|     ***| Description |***
+|     Keyword สำหรับเข้าสูเว็บไซต์
+--------------------------------------------------------------------------
+|     ***| Required Parameter |***
+|     $url       : ระบุลิ้งเว็ปไซต์
+|     $browser   : ระบุบราวเซอร์
+--------------------------------------------------------------------------
+|     ***| Examples of use |***
+|     Open Web Browser     https://the-internet.herokuapp.com/login    chrome  🗂️ ใช้ภายในไฟล์
+|     LoginPage.Open Web Browser   https://the-internet.herokuapp.com/login    chrome  🌐 ใช้ภายนอกไฟล์
+==&gt;</doc>
+<status status="PASS" start="2025-07-24T02:47:28.153202" elapsed="8.022021"/>
+</kw>
+<kw name="Input Username" owner="LoginPageWeb">
+<kw name="_Set Test Local Variables" owner="LoginPageWeb" type="SETUP">
+<variable name="${_TIMEOUT_RETURN_STATUS}" scope="test">
+<msg time="2025-07-24T02:47:36.180257" level="INFO">${_TIMEOUT_RETURN_STATUS} = 3</msg>
+<var>${Time_Out.Return_Status}</var>
+<status status="PASS" start="2025-07-24T02:47:36.179271" elapsed="0.000986"/>
+</variable>
+<variable name="${_TIMEOUT_RETURN_STATUS_MEDIUM}" scope="test">
+<msg time="2025-07-24T02:47:36.181256" level="INFO">${_TIMEOUT_RETURN_STATUS_MEDIUM} = 10</msg>
+<var>${Time_Out.Return_Status_Medium}</var>
+<status status="PASS" start="2025-07-24T02:47:36.180257" elapsed="0.000999"/>
+</variable>
+<variable name="${_TIMEOUT_RETURN_STATUS_QUICK}" scope="test">
+<msg time="2025-07-24T02:47:36.182243" level="INFO">${_TIMEOUT_RETURN_STATUS_QUICK} = 1</msg>
+<var>${Time_Out.Return_Status_Quick}</var>
+<status status="PASS" start="2025-07-24T02:47:36.181256" elapsed="0.001985"/>
+</variable>
+<variable name="${_TIMEOUT_LONG}" scope="test">
+<msg time="2025-07-24T02:47:36.183241" level="INFO">${_TIMEOUT_LONG} = 60</msg>
+<var>${Time_Out.Long}</var>
+<status status="PASS" start="2025-07-24T02:47:36.183241" elapsed="0.000999"/>
+</variable>
+<variable name="${_TIMEOUT_DEFAULT}" scope="test">
+<msg time="2025-07-24T02:47:36.184240" level="INFO">${_TIMEOUT_DEFAULT} = 15</msg>
+<var>${Time_Out.Default}</var>
+<status status="PASS" start="2025-07-24T02:47:36.184240" elapsed="0.000999"/>
+</variable>
+<variable name="${_BTN_USERNAME}" scope="test">
+<msg time="2025-07-24T02:47:36.186240" level="INFO">${_BTN_USERNAME} = xpath=//*[@id="username"]</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnUsername}</var>
+<status status="PASS" start="2025-07-24T02:47:36.185239" elapsed="0.001001"/>
+</variable>
+<variable name="${_BTN_PASSWORD}" scope="test">
+<msg time="2025-07-24T02:47:36.186750" level="INFO">${_BTN_PASSWORD} = xpath=//*[@id="password"]</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnPassword}</var>
+<status status="PASS" start="2025-07-24T02:47:36.186240" elapsed="0.000510"/>
+</variable>
+<variable name="${_BTN_LOGIN}" scope="test">
+<msg time="2025-07-24T02:47:36.186750" level="INFO">${_BTN_LOGIN} = xpath=//button[@type='submit']</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnLogin}</var>
+<status status="PASS" start="2025-07-24T02:47:36.186750" elapsed="0.001504"/>
+</variable>
+<variable name="${_BTN_INVALID}" scope="test">
+<msg time="2025-07-24T02:47:36.189170" level="INFO">${_BTN_INVALID} = xpath=//*[@id="flash"]</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnInvalid}</var>
+<status status="PASS" start="2025-07-24T02:47:36.188254" elapsed="0.000916"/>
+</variable>
+<tag>robot:private</tag>
+<doc>เตรียมตัวแปรสำหรับใช้งานในแต่ละ Keywords</doc>
+<status status="PASS" start="2025-07-24T02:47:36.178233" elapsed="0.012075"/>
+</kw>
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${_BTN_USERNAME}</arg>
+<arg>${timeout}</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2025-07-24T02:47:36.191308" elapsed="0.021846"/>
+</kw>
+<msg time="2025-07-24T02:47:36.214186" level="INFO">${Status} = True</msg>
+<var>${Status}</var>
+<arg>SeleniumLibrary.Wait Until Element Is Visible</arg>
+<arg>${_BTN_USERNAME}</arg>
+<arg>${timeout}</arg>
+<doc>Runs the given keyword with given arguments and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2025-07-24T02:47:36.190308" elapsed="0.023878"/>
+</kw>
+<if>
+<branch type="IF" condition="${Status}">
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2025-07-24T02:47:36.215173" level="INFO">Typing text 'tomholland' into text field 'xpath=//*[@id="username"]'.</msg>
+<arg>locator=${_BTN_USERNAME}</arg>
+<arg>text=${username}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2025-07-24T02:47:36.214186" elapsed="0.091617"/>
+</kw>
+<status status="PASS" start="2025-07-24T02:47:36.214186" elapsed="0.091617"/>
+</branch>
+<branch type="ELSE">
+<kw name="Fail" owner="BuiltIn">
+<arg>msg=${_BTN_USERNAME} Not Found</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2025-07-24T02:47:36.307822" elapsed="0.000000"/>
+</kw>
+<status status="NOT RUN" start="2025-07-24T02:47:36.306809" elapsed="0.002016"/>
+</branch>
+<status status="PASS" start="2025-07-24T02:47:36.214186" elapsed="0.094639"/>
+</if>
+<arg>username=${_USERNAME_FAIL}</arg>
+<doc>Owner : Danai Lertkamjornwat
+|     ***| Description |***
+|     Keyword ระบุ Username
+--------------------------------------------------------------------------
+|     ***| Required Parameter |***
+|     $username   : รหัสชื่อผู้ใช้งาน
+--------------------------------------------------------------------------
+|     ***| Optional Parameter |***
+|     $timeout    : เวลา Wait Element (ค่า default = 15)
+--------------------------------------------------------------------------
+|     ***| Examples of use |***
+|     Input Username    tomsmith     🗂️ ใช้ภายในไฟล์
+|     LoginPage.Input Username    tomsmith   🌐 ใช้ภายนอกไฟล์
+==&gt;</doc>
+<status status="PASS" start="2025-07-24T02:47:36.176727" elapsed="0.132098"/>
+</kw>
+<kw name="Input Password" owner="LoginPageWeb">
+<kw name="_Set Test Local Variables" owner="LoginPageWeb" type="SETUP">
+<variable name="${_TIMEOUT_RETURN_STATUS}" scope="test">
+<msg time="2025-07-24T02:47:36.312837" level="INFO">${_TIMEOUT_RETURN_STATUS} = 3</msg>
+<var>${Time_Out.Return_Status}</var>
+<status status="PASS" start="2025-07-24T02:47:36.311828" elapsed="0.001009"/>
+</variable>
+<variable name="${_TIMEOUT_RETURN_STATUS_MEDIUM}" scope="test">
+<msg time="2025-07-24T02:47:36.313830" level="INFO">${_TIMEOUT_RETURN_STATUS_MEDIUM} = 10</msg>
+<var>${Time_Out.Return_Status_Medium}</var>
+<status status="PASS" start="2025-07-24T02:47:36.312837" elapsed="0.000993"/>
+</variable>
+<variable name="${_TIMEOUT_RETURN_STATUS_QUICK}" scope="test">
+<msg time="2025-07-24T02:47:36.314809" level="INFO">${_TIMEOUT_RETURN_STATUS_QUICK} = 1</msg>
+<var>${Time_Out.Return_Status_Quick}</var>
+<status status="PASS" start="2025-07-24T02:47:36.313830" elapsed="0.000979"/>
+</variable>
+<variable name="${_TIMEOUT_LONG}" scope="test">
+<msg time="2025-07-24T02:47:36.315810" level="INFO">${_TIMEOUT_LONG} = 60</msg>
+<var>${Time_Out.Long}</var>
+<status status="PASS" start="2025-07-24T02:47:36.315810" elapsed="0.000000"/>
+</variable>
+<variable name="${_TIMEOUT_DEFAULT}" scope="test">
+<msg time="2025-07-24T02:47:36.317004" level="INFO">${_TIMEOUT_DEFAULT} = 15</msg>
+<var>${Time_Out.Default}</var>
+<status status="PASS" start="2025-07-24T02:47:36.315810" elapsed="0.001194"/>
+</variable>
+<variable name="${_BTN_USERNAME}" scope="test">
+<msg time="2025-07-24T02:47:36.318006" level="INFO">${_BTN_USERNAME} = xpath=//*[@id="username"]</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnUsername}</var>
+<status status="PASS" start="2025-07-24T02:47:36.317004" elapsed="0.001002"/>
+</variable>
+<variable name="${_BTN_PASSWORD}" scope="test">
+<msg time="2025-07-24T02:47:36.319005" level="INFO">${_BTN_PASSWORD} = xpath=//*[@id="password"]</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnPassword}</var>
+<status status="PASS" start="2025-07-24T02:47:36.318006" elapsed="0.000999"/>
+</variable>
+<variable name="${_BTN_LOGIN}" scope="test">
+<msg time="2025-07-24T02:47:36.320004" level="INFO">${_BTN_LOGIN} = xpath=//button[@type='submit']</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnLogin}</var>
+<status status="PASS" start="2025-07-24T02:47:36.319005" elapsed="0.000999"/>
+</variable>
+<variable name="${_BTN_INVALID}" scope="test">
+<msg time="2025-07-24T02:47:36.321043" level="INFO">${_BTN_INVALID} = xpath=//*[@id="flash"]</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnInvalid}</var>
+<status status="PASS" start="2025-07-24T02:47:36.320004" elapsed="0.001039"/>
+</variable>
+<tag>robot:private</tag>
+<doc>เตรียมตัวแปรสำหรับใช้งานในแต่ละ Keywords</doc>
+<status status="PASS" start="2025-07-24T02:47:36.311828" elapsed="0.009215"/>
+</kw>
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${_BTN_PASSWORD}</arg>
+<arg>${timeout}</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2025-07-24T02:47:36.322006" elapsed="0.024171"/>
+</kw>
+<msg time="2025-07-24T02:47:36.346177" level="INFO">${Status} = True</msg>
+<var>${Status}</var>
+<arg>SeleniumLibrary.Wait Until Element Is Visible</arg>
+<arg>${_BTN_PASSWORD}</arg>
+<arg>${timeout}</arg>
+<doc>Runs the given keyword with given arguments and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2025-07-24T02:47:36.321043" elapsed="0.025639"/>
+</kw>
+<if>
+<branch type="IF" condition="${Status}">
+<kw name="Input Text" owner="SeleniumLibrary">
+<msg time="2025-07-24T02:47:36.346682" level="INFO">Typing text 'SuperSecretPassword!' into text field 'xpath=//*[@id="password"]'.</msg>
+<arg>locator=${_BTN_PASSWORD}</arg>
+<arg>text=${password}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<status status="PASS" start="2025-07-24T02:47:36.346682" elapsed="0.088149"/>
+</kw>
+<status status="PASS" start="2025-07-24T02:47:36.346682" elapsed="0.088149"/>
+</branch>
+<branch type="ELSE">
+<kw name="Fail" owner="BuiltIn">
+<arg>msg=${_BTN_USERNAME} Not Found</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2025-07-24T02:47:36.435838" elapsed="0.000000"/>
+</kw>
+<status status="NOT RUN" start="2025-07-24T02:47:36.434831" elapsed="0.001007"/>
+</branch>
+<status status="PASS" start="2025-07-24T02:47:36.346682" elapsed="0.089156"/>
+</if>
+<arg>password=${_PASSWORD}</arg>
+<doc>Owner : Danai Lertkamjornwat
+|     ***| Description |***
+|     Keyword ระบุ Password
+--------------------------------------------------------------------------
+|     ***| Required Parameter |***
+|     $password   : รหัสผู้ใช้งาน
+--------------------------------------------------------------------------
+|     ***| Optional Parameter |***
+|     $timeout    : เวลา Wait Element (ค่า default = 15)
+--------------------------------------------------------------------------
+|     ***| Examples of use |***
+|     Input Password    SuperSecretPassword!     🗂️ ใช้ภายในไฟล์
+|     LoginPage.Input Password    SuperSecretPassword!   🌐 ใช้ภายนอกไฟล์
+==&gt;</doc>
+<status status="PASS" start="2025-07-24T02:47:36.310832" elapsed="0.125006"/>
+</kw>
+<kw name="Click Login Button" owner="LoginPageWeb">
+<kw name="_Set Test Local Variables" owner="LoginPageWeb" type="SETUP">
+<variable name="${_TIMEOUT_RETURN_STATUS}" scope="test">
+<msg time="2025-07-24T02:47:36.442323" level="INFO">${_TIMEOUT_RETURN_STATUS} = 3</msg>
+<var>${Time_Out.Return_Status}</var>
+<status status="PASS" start="2025-07-24T02:47:36.441322" elapsed="0.001001"/>
+</variable>
+<variable name="${_TIMEOUT_RETURN_STATUS_MEDIUM}" scope="test">
+<msg time="2025-07-24T02:47:36.444319" level="INFO">${_TIMEOUT_RETURN_STATUS_MEDIUM} = 10</msg>
+<var>${Time_Out.Return_Status_Medium}</var>
+<status status="PASS" start="2025-07-24T02:47:36.442323" elapsed="0.001996"/>
+</variable>
+<variable name="${_TIMEOUT_RETURN_STATUS_QUICK}" scope="test">
+<msg time="2025-07-24T02:47:36.445829" level="INFO">${_TIMEOUT_RETURN_STATUS_QUICK} = 1</msg>
+<var>${Time_Out.Return_Status_Quick}</var>
+<status status="PASS" start="2025-07-24T02:47:36.444319" elapsed="0.001510"/>
+</variable>
+<variable name="${_TIMEOUT_LONG}" scope="test">
+<msg time="2025-07-24T02:47:36.446874" level="INFO">${_TIMEOUT_LONG} = 60</msg>
+<var>${Time_Out.Long}</var>
+<status status="PASS" start="2025-07-24T02:47:36.445829" elapsed="0.001045"/>
+</variable>
+<variable name="${_TIMEOUT_DEFAULT}" scope="test">
+<msg time="2025-07-24T02:47:36.447840" level="INFO">${_TIMEOUT_DEFAULT} = 15</msg>
+<var>${Time_Out.Default}</var>
+<status status="PASS" start="2025-07-24T02:47:36.446874" elapsed="0.000966"/>
+</variable>
+<variable name="${_BTN_USERNAME}" scope="test">
+<msg time="2025-07-24T02:47:36.448839" level="INFO">${_BTN_USERNAME} = xpath=//*[@id="username"]</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnUsername}</var>
+<status status="PASS" start="2025-07-24T02:47:36.447840" elapsed="0.000999"/>
+</variable>
+<variable name="${_BTN_PASSWORD}" scope="test">
+<msg time="2025-07-24T02:47:36.449839" level="INFO">${_BTN_PASSWORD} = xpath=//*[@id="password"]</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnPassword}</var>
+<status status="PASS" start="2025-07-24T02:47:36.448839" elapsed="0.001000"/>
+</variable>
+<variable name="${_BTN_LOGIN}" scope="test">
+<msg time="2025-07-24T02:47:36.450837" level="INFO">${_BTN_LOGIN} = xpath=//button[@type='submit']</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnLogin}</var>
+<status status="PASS" start="2025-07-24T02:47:36.449839" elapsed="0.000998"/>
+</variable>
+<variable name="${_BTN_INVALID}" scope="test">
+<msg time="2025-07-24T02:47:36.451837" level="INFO">${_BTN_INVALID} = xpath=//*[@id="flash"]</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnInvalid}</var>
+<status status="PASS" start="2025-07-24T02:47:36.450837" elapsed="0.002000"/>
+</variable>
+<tag>robot:private</tag>
+<doc>เตรียมตัวแปรสำหรับใช้งานในแต่ละ Keywords</doc>
+<status status="PASS" start="2025-07-24T02:47:36.439322" elapsed="0.013515"/>
+</kw>
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${_BTN_LOGIN}</arg>
+<arg>${timeout}</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2025-07-24T02:47:36.452837" elapsed="0.015519"/>
+</kw>
+<msg time="2025-07-24T02:47:36.469366" level="INFO">${Status} = True</msg>
+<var>${Status}</var>
+<arg>SeleniumLibrary.Wait Until Element Is Visible</arg>
+<arg>${_BTN_LOGIN}</arg>
+<arg>${timeout}</arg>
+<doc>Runs the given keyword with given arguments and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2025-07-24T02:47:36.452837" elapsed="0.016529"/>
+</kw>
+<if>
+<branch type="IF" condition="${Status}">
+<kw name="Click Element" owner="SeleniumLibrary">
+<msg time="2025-07-24T02:47:36.470363" level="INFO">Clicking element 'xpath=//button[@type='submit']'.</msg>
+<arg>${_BTN_LOGIN}</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<status status="PASS" start="2025-07-24T02:47:36.469366" elapsed="0.728601"/>
+</kw>
+<status status="PASS" start="2025-07-24T02:47:36.469366" elapsed="0.728601"/>
+</branch>
+<branch type="ELSE">
+<kw name="Fail" owner="BuiltIn">
+<arg>msg=Button Not Found</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2025-07-24T02:47:37.198966" elapsed="0.000000"/>
+</kw>
+<status status="NOT RUN" start="2025-07-24T02:47:37.197967" elapsed="0.000999"/>
+</branch>
+<status status="PASS" start="2025-07-24T02:47:36.469366" elapsed="0.729600"/>
+</if>
+<doc>Owner : Danai Lertkamjornwat
+|     ***| Description |***
+|     Keyword คลิกปุ่ม Login
+--------------------------------------------------------------------------
+|     ***| Optional Parameter |***
+|     $timeout    : เวลา Wait Element (ค่า default = 15)
+--------------------------------------------------------------------------
+|     ***| Examples of use |***
+|     Click Login Buttonr     🗂️ ใช้ภายในไฟล์
+|     LoginPage.Click Login Button   🌐 ใช้ภายนอกไฟล์
+==&gt;</doc>
+<status status="PASS" start="2025-07-24T02:47:36.438323" elapsed="0.760643"/>
+</kw>
+<kw name="Validate Popup Message" owner="LoginPageWeb">
+<kw name="_Set Test Local Variables" owner="LoginPageWeb" type="SETUP">
+<variable name="${_TIMEOUT_RETURN_STATUS}" scope="test">
+<msg time="2025-07-24T02:47:37.204965" level="INFO">${_TIMEOUT_RETURN_STATUS} = 3</msg>
+<var>${Time_Out.Return_Status}</var>
+<status status="PASS" start="2025-07-24T02:47:37.203966" elapsed="0.000999"/>
+</variable>
+<variable name="${_TIMEOUT_RETURN_STATUS_MEDIUM}" scope="test">
+<msg time="2025-07-24T02:47:37.206468" level="INFO">${_TIMEOUT_RETURN_STATUS_MEDIUM} = 10</msg>
+<var>${Time_Out.Return_Status_Medium}</var>
+<status status="PASS" start="2025-07-24T02:47:37.204965" elapsed="0.001503"/>
+</variable>
+<variable name="${_TIMEOUT_RETURN_STATUS_QUICK}" scope="test">
+<msg time="2025-07-24T02:47:37.208654" level="INFO">${_TIMEOUT_RETURN_STATUS_QUICK} = 1</msg>
+<var>${Time_Out.Return_Status_Quick}</var>
+<status status="PASS" start="2025-07-24T02:47:37.207484" elapsed="0.001170"/>
+</variable>
+<variable name="${_TIMEOUT_LONG}" scope="test">
+<msg time="2025-07-24T02:47:37.209652" level="INFO">${_TIMEOUT_LONG} = 60</msg>
+<var>${Time_Out.Long}</var>
+<status status="PASS" start="2025-07-24T02:47:37.208654" elapsed="0.002000"/>
+</variable>
+<variable name="${_TIMEOUT_DEFAULT}" scope="test">
+<msg time="2025-07-24T02:47:37.212653" level="INFO">${_TIMEOUT_DEFAULT} = 15</msg>
+<var>${Time_Out.Default}</var>
+<status status="PASS" start="2025-07-24T02:47:37.210654" elapsed="0.001999"/>
+</variable>
+<variable name="${_BTN_USERNAME}" scope="test">
+<msg time="2025-07-24T02:47:37.214701" level="INFO">${_BTN_USERNAME} = xpath=//*[@id="username"]</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnUsername}</var>
+<status status="PASS" start="2025-07-24T02:47:37.213652" elapsed="0.001049"/>
+</variable>
+<variable name="${_BTN_PASSWORD}" scope="test">
+<msg time="2025-07-24T02:47:37.216929" level="INFO">${_BTN_PASSWORD} = xpath=//*[@id="password"]</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnPassword}</var>
+<status status="PASS" start="2025-07-24T02:47:37.214701" elapsed="0.002228"/>
+</variable>
+<variable name="${_BTN_LOGIN}" scope="test">
+<msg time="2025-07-24T02:47:37.218799" level="INFO">${_BTN_LOGIN} = xpath=//button[@type='submit']</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnLogin}</var>
+<status status="PASS" start="2025-07-24T02:47:37.216929" elapsed="0.002882"/>
+</variable>
+<variable name="${_BTN_INVALID}" scope="test">
+<msg time="2025-07-24T02:47:37.220670" level="INFO">${_BTN_INVALID} = xpath=//*[@id="flash"]</msg>
+<var>${Xpath.${ENV}.${Device}.LoginPage.btnInvalid}</var>
+<status status="PASS" start="2025-07-24T02:47:37.219811" elapsed="0.000859"/>
+</variable>
+<tag>robot:private</tag>
+<doc>เตรียมตัวแปรสำหรับใช้งานในแต่ละ Keywords</doc>
+<status status="PASS" start="2025-07-24T02:47:37.203966" elapsed="0.016704"/>
+</kw>
+<kw name="Run Keyword And Return Status" owner="BuiltIn">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>${_BTN_INVALID}</arg>
+<arg>${timeout}</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" start="2025-07-24T02:47:37.221784" elapsed="0.024105"/>
+</kw>
+<msg time="2025-07-24T02:47:37.245889" level="INFO">${Status} = True</msg>
+<var>${Status}</var>
+<arg>SeleniumLibrary.Wait Until Element Is Visible</arg>
+<arg>${_BTN_INVALID}</arg>
+<arg>${timeout}</arg>
+<doc>Runs the given keyword with given arguments and returns the status as a Boolean value.</doc>
+<status status="PASS" start="2025-07-24T02:47:37.221784" elapsed="0.024105"/>
+</kw>
+<if>
+<branch type="IF" condition="${Status}">
+<kw name="Get Text" owner="SeleniumLibrary">
+<msg time="2025-07-24T02:47:37.264519" level="INFO">${Actual} = Your username is invalid!
+×</msg>
+<var>${Actual}</var>
+<arg>${_BTN_INVALID}</arg>
+<doc>Returns the text value of the element identified by ``locator``.</doc>
+<status status="PASS" start="2025-07-24T02:47:37.246936" elapsed="0.017583"/>
+</kw>
+<kw name="Replace String" owner="String">
+<msg time="2025-07-24T02:47:37.266058" level="INFO">${Actual} = Your username is invalid!
+</msg>
+<var>${Actual}</var>
+<arg>${Actual}</arg>
+<arg>×</arg>
+<arg>${EMPTY}</arg>
+<doc>Replaces ``search_for`` in the given ``string`` with ``replace_with``.</doc>
+<status status="PASS" start="2025-07-24T02:47:37.264519" elapsed="0.001539"/>
+</kw>
+<kw name="Strip String" owner="String">
+<msg time="2025-07-24T02:47:37.267073" level="INFO">${Actual} = Your username is invalid!</msg>
+<var>${Actual}</var>
+<arg>${Actual}</arg>
+<doc>Remove leading and/or trailing whitespaces from the given string.</doc>
+<status status="PASS" start="2025-07-24T02:47:37.266058" elapsed="0.001015"/>
 </kw>
 <kw name="Should Be Equal" owner="BuiltIn">
-<arg>${response.text}</arg>
-<arg>{}</arg>
+<arg>${Actual}</arg>
+<arg>${expect}</arg>
 <doc>Fails if the given objects are unequal.</doc>
-<status status="PASS" start="2025-07-23T18:55:18.863021" elapsed="0.000000"/>
+<status status="PASS" start="2025-07-24T02:47:37.267073" elapsed="0.000964"/>
+</kw>
+<status status="PASS" start="2025-07-24T02:47:37.245889" elapsed="0.022148"/>
+</branch>
+<branch type="ELSE">
+<kw name="Fail" owner="BuiltIn">
+<arg>msg=Popup Not Found</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2025-07-24T02:47:37.268037" elapsed="0.000000"/>
+</kw>
+<status status="NOT RUN" start="2025-07-24T02:47:37.268037" elapsed="0.000000"/>
+</branch>
+<status status="PASS" start="2025-07-24T02:47:37.245889" elapsed="0.022148"/>
+</if>
+<arg>expect=${_USERNAME_ERROR_TEXT}</arg>
+<doc>Owner : Danai Lertkamjornwat
+|     ***| Description |***
+|     Keyword ตรวจสอบ Validate Popup Message
+--------------------------------------------------------------------------
+|     ***| Required Parameter |***
+|     $expect     : ข้อความที่จะ Validate
+--------------------------------------------------------------------------
+|     ***| Optional Parameter |***
+|     $timeout    : เวลา Wait Element (ค่า default = 15)
+--------------------------------------------------------------------------
+|     ***| Examples of use |***
+|     Validate Popup Message    ${expect}     🗂️ ใช้ภายในไฟล์
+|     LoginPage.Validate Popup Message    ${expect}       🌐 ใช้ภายนอกไฟล์
+==&gt;</doc>
+<status status="PASS" start="2025-07-24T02:47:37.201998" elapsed="0.066039"/>
 </kw>
 <doc>Owner : Danai Lertkamjornwat
 |    ***| Description |***
-|    ตรวจสอบยิง API Status 404
+|    ตรวจสอบเข้าสู่ระบบไม่สำเร็จกรณีระบุ Username ผิด
 --------------------------------------------------------------------------
 |    ***| Test Step |***
-|    1.Send Get requestto url https://reqres.in/api/users/1234
+|    1. เปิดเว็บไซต์
+|    2. ระบุ Username
+|    3. ระบุ Password
+|    4. คลิกปุ่ม Login
+|    5. ไม่สามารถเข้าสู่ระบบได้
+|    6. ปิด Browser
 --------------------------------------------------------------------------
 |    ***| Expected Result |***
-|    ยิงไปต้องได้ Status 404 และไม่มีข้อมูล
+|    ต้องเข้าสู่ระบบได้ถูกต้อง
 ==&gt;</doc>
-<tag>api</tag>
-<status status="PASS" start="2025-07-23T18:55:18.711762" elapsed="0.152266"/>
+<tag>fail</tag>
+<status status="PASS" start="2025-07-24T02:47:28.151016" elapsed="9.118032"/>
 </test>
-<status status="PASS" start="2025-07-23T18:55:18.269401" elapsed="0.595627"/>
+<kw name="Close Browser" owner="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2025-07-24T02:47:37.270068" elapsed="2.186126"/>
+</kw>
+<status status="PASS" start="2025-07-24T02:47:27.699171" elapsed="11.758044"/>
 </suite>
-<status status="PASS" start="2025-07-23T18:55:18.268394" elapsed="0.598139"/>
+<status status="PASS" start="2025-07-24T02:47:27.697167" elapsed="11.764062"/>
 </suite>
-<status status="PASS" start="2025-07-23T18:55:18.265354" elapsed="0.602186"/>
+<status status="PASS" start="2025-07-24T02:47:27.696058" elapsed="11.766169"/>
 </suite>
-<status status="PASS" start="2025-07-23T18:55:18.251830" elapsed="0.616709"/>
+<status status="PASS" start="2025-07-24T02:47:27.694060" elapsed="11.770165"/>
+</suite>
+<status status="PASS" start="2025-07-24T02:47:27.680047" elapsed="11.786018"/>
 </suite>
 <statistics>
 <total>
 <stat pass="1" fail="0" skip="0">All Tests</stat>
 </total>
 <tag>
-<stat pass="1" fail="0" skip="0">api</stat>
+<stat pass="1" fail="0" skip="0">fail</stat>
 </tag>
 <suite>
 <stat name="TTB-Automation-Assignment" id="s1" pass="1" fail="0" skip="0">TTB-Automation-Assignment</stat>
 <stat name="TestScript" id="s1-s1" pass="1" fail="0" skip="0">TTB-Automation-Assignment.TestScript</stat>
-<stat name="API" id="s1-s1-s1" pass="1" fail="0" skip="0">TTB-Automation-Assignment.TestScript.API</stat>
-<stat name="API" id="s1-s1-s1-s1" pass="1" fail="0" skip="0">TTB-Automation-Assignment.TestScript.API.API</stat>
+<stat name="Web" id="s1-s1-s1" pass="1" fail="0" skip="0">TTB-Automation-Assignment.TestScript.Web</stat>
+<stat name="Staging" id="s1-s1-s1-s1" pass="1" fail="0" skip="0">TTB-Automation-Assignment.TestScript.Web.Staging</stat>
+<stat name="FlowLogin" id="s1-s1-s1-s1-s1" pass="1" fail="0" skip="0">TTB-Automation-Assignment.TestScript.Web.Staging.FlowLogin</stat>
 </suite>
 </statistics>
 <errors>
