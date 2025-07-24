@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout Code From Git') {
+            steps {
+                git 'https://github.com/kaakom100/TTB-Automation-Assignment'
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                // ติดตั้ง dependencies จาก requirements.txt
+                bat 'pip install --upgrade pip'
+                bat 'pip install -r requirements.txt'
+            }
+        }
+        stage('Run Test Automate') {
+            steps {
+                // รัน robot ในโฟลเดอร์ TestScript 
+                bat 'robot TestScript'
+            }
+        }
+        stage('Send Result To Jenkins') {
+            steps {
+                // ให้ Jenkins แสดงผล output.xml (Robot Framework สร้าง output.xml ในโฟลเดอร์ root)
+                junit 'output.xml'
+            }
+        }
+    }
+}

@@ -9,3 +9,4 @@ list_a = [1,2,3,5,6,8,9]
 list_b = [3,2,1,5,6,0]
 duplicate = find_duplicate(list_a, list_b)
 print(duplicate)  
+# รัน test ได้ด้วย python find_duplicate.py
