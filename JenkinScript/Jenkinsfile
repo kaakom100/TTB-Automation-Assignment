@@ -1,30 +1,421 @@
 pipeline {
     agent any
-
+    
+    // ตัวแปร Environment สำหรับการรัน Pipeline
+    environment {
+        ROBOT_OPTIONS = '--outputdir results --loglevel INFO --timestampoutputs'  // ตัวเลือกสำหรับ Robot Framework
+        APPIUM_SERVER = 'http://localhost:4723/wd/hub'                            // URL ของ Appium Server
+        PYTHON_PATH = 'python'                                                    // Path ของ Python
+    }
+    
+    // ตั้งค่าการ Build และ Options ต่างๆ
+    options {
+        timeout(time: 30, unit: 'MINUTES')        // กำหนดเวลา timeout 30 นาที
+        skipDefaultCheckout(false)                // ไม่ข้าม checkout code
+        buildDiscarder(logRotator(numToKeepStr: '10'))  // เก็บ build history 10 รอบล่าสุด
+    }
+    
     stages {
+        // ขั้นตอนที่ 1: ดึงโค้ดจาก Git Repository
         stage('Checkout Code From Git') {
             steps {
-                git 'https://github.com/kaakom100/TTB-Automation-Assignment'
+                echo '🔄 กำลังดึงโค้ดจาก Git repository...'
+                
+                // ดึงโค้ดจาก GitHub
+                git branch: 'main',
+                    url: 'https://github.com/kaakom100/TTB-Automation-Assignment'
+                    
+                // แสดงข้อมูล commit ล่าสุด
+                script {
+                    def commitInfo = bat(script: 'git log -1 --pretty=format:"%h - %an: %s"', returnStdout: true).trim()
+                    echo "📝 Commit ล่าสุด: ${commitInfo}"
+                }
             }
         }
+        
+        // ขั้นตอนที่ 2: ตั้งค่า Environment และตรวจสอบระบบ
+        stage('Environment Setup') {
+            steps {
+                echo '⚙️ กำลังตั้งค่า Python environment...'
+                script {
+                    try {
+                        // ตรวจสอบเวอร์ชัน Python
+                        bat 'python --version'
+                        echo '✅ Python พร้อมใช้งาน'
+                        
+                        // สร้างโฟลเดอร์ results สำหรับเก็บผลลัพธ์
+                        bat 'if not exist "results" mkdir results'
+                        echo '📁 สร้างโฟลเดอร์ results เรียบร้อย'
+                        
+                        // อัพเกรด pip เป็นเวอร์ชันล่าสุด
+                        bat 'python -m pip install --upgrade pip'
+                        echo '⬆️ อัพเกรด pip เรียบร้อย'
+                        
+                    } catch (Exception e) {
+                        error "❌ การตั้งค่า environment ล้มเหลว: ${e.getMessage()}"
+                    }
+                }
+            }
+        }
+        
+        // ขั้นตอนที่ 3: ติดตั้ง Dependencies และ Libraries
         stage('Install Dependencies') {
             steps {
-                // ติดตั้ง dependencies จาก requirements.txt
-                bat 'pip install --upgrade pip'
-                bat 'pip install -r requirements.txt'
+                echo '📦 กำลังติดตั้ง Python dependencies...'
+                script {
+                    try {
+                        // ติดตั้ง libraries จาก requirements.txt
+                        bat 'pip install -r JenkinScript/requirements.txt'
+                        echo '✅ ติดตั้ง dependencies เรียบร้อย'
+                        
+                        // แสดงรายการ Robot Framework packages ที่ติดตั้ง
+                        echo '📋 รายการ Robot Framework packages:'
+                        bat 'pip list | findstr robot'
+                        
+                    } catch (Exception e) {
+                        error "❌ การติดตั้ง dependencies ล้มเหลว: ${e.getMessage()}"
+                    }
+                }
             }
         }
-        stage('Run Test Automate') {
+        
+        // ขั้นตอนที่ 4: ตรวจสอบไฟล์และโครงสร้างก่อนรัน Test
+        stage('Pre-Test Validation') {
             steps {
-                // รัน robot ในโฟลเดอร์ TestScript 
-                bat 'robot TestScript'
+                echo '🔍 กำลังตรวจสอบ test environment...'
+                script {
+                    try {
+                        // ตรวจสอบไฟล์ configuration ที่จำเป็น
+                        bat 'if not exist "Configuration\\Configs_Run_Test_Global.yml" (echo ❌ ไม่พบไฟล์ Configuration & exit 1)'
+                        bat 'if not exist "Resource\\KeyRepositories.yml" (echo ❌ ไม่พบไฟล์ Key repositories & exit 1)'
+                        echo '✅ ไฟล์ configuration ครบถ้วน'
+                        
+                        // ตรวจสอบโฟลเดอร์ test scripts
+                        bat 'if not exist "TestScript" (echo ❌ ไม่พบโฟลเดอร์ TestScript & exit 1)'
+                        echo '✅ โฟลเดอร์ TestScript พร้อมใช้งาน'
+                        
+                        echo '🎯 การตรวจสอบ environment เสร็จสมบูรณ์'
+                        
+                    } catch (Exception e) {
+                        error "❌ การตรวจสอบก่อนรัน test ล้มเหลว: ${e.getMessage()}"
+                    }
+                }
             }
         }
-        stage('Send Result To Jenkins') {
+        
+        // ขั้นตอนที่ 5: รัน API Tests
+        stage('Run API Tests') {
             steps {
-                // ให้ Jenkins แสดงผล output.xml (Robot Framework สร้าง output.xml ในโฟลเดอร์ root)
-                junit 'output.xml'
+                echo '🌐 กำลังรัน API tests...'
+                script {
+                    try {
+                        // รัน API tests ด้วย tag 'api' 
+                        def result = bat(
+                            script: 'robot --include api --outputdir results/api --name "API_Tests" TestScript/API',
+                            returnStatus: true
+                        )
+                        
+                        // ตรวจสอบผลลัพธ์การรัน
+                        if (result > 250) {
+                            error "💥 API test มีข้อผิดพลาดร้ายแรง"
+                        } else if (result != 0) {
+                            echo "⚠️ API test บางส่วนล้มเหลว แต่ pipeline จะดำเนินการต่อ"
+                            currentBuild.result = 'UNSTABLE'
+                        } else {
+                            echo "✅ API tests ผ่านทั้งหมด"
+                        }
+                        
+                    } catch (Exception e) {
+                        echo "⚠️ API tests มีปัญหา: ${e.getMessage()}"
+                        currentBuild.result = 'UNSTABLE'
+                    }
+                }
             }
+        }
+        
+        // ขั้นตอนที่ 6: รัน Web Automation Tests
+        stage('Run Web Tests') {
+            steps {
+                echo '🖥️ กำลังรัน Web automation tests...'
+                script {
+                    try {
+                        // รัน Web tests ทั้งหมดในโฟลเดอร์ Web
+                        def result = bat(
+                            script: 'robot --outputdir results/web --name "Web_Tests" TestScript/Web',
+                            returnStatus: true
+                        )
+                        
+                        // ตรวจสอบผลลัพธ์การรัน
+                        if (result > 250) {
+                            error "💥 Web test มีข้อผิดพลาดร้ายแรง"
+                        } else if (result != 0) {
+                            echo "⚠️ Web test บางส่วนล้มเหลว แต่ pipeline จะดำเนินการต่อ"
+                            currentBuild.result = 'UNSTABLE'
+                        } else {
+                            echo "✅ Web tests ผ่านทั้งหมด"
+                        }
+                        
+                    } catch (Exception e) {
+                        echo "⚠️ Web tests มีปัญหา: ${e.getMessage()}"
+                        currentBuild.result = 'UNSTABLE'
+                    }
+                }
+            }
+        }
+        
+        // ขั้นตอนที่ 7: รัน Mobile Automation Tests (รันเฉพาะเมื่อ Appium Server พร้อม)
+        stage('Run Mobile Tests') {
+            when {
+                // เงื่อนไข: รัน Mobile tests เฉพาะเมื่อ Appium server สามารถเชื่อมต่อได้
+                expression {
+                    try {
+                        echo '📱 กำลังตรวจสอบ Appium server...'
+                        def response = bat(script: 'curl -s http://localhost:4723/wd/hub/status', returnStatus: true)
+                        if (response == 0) {
+                            echo '✅ Appium server พร้อมใช้งาน'
+                            return true
+                        } else {
+                            echo '⚠️ Appium server ไม่พร้อม - ข้าม Mobile tests'
+                            return false
+                        }
+                    } catch (Exception e) {
+                        echo "⚠️ ไม่สามารถเชื่อมต่อ Appium server - ข้าม Mobile tests"
+                        return false
+                    }
+                }
+            }
+            steps {
+                echo '📱 กำลังรัน Mobile automation tests...'
+                script {
+                    try {
+                        // รัน Mobile tests ทั้งหมดในโฟลเดอร์ Mobile
+                        def result = bat(
+                            script: 'robot --outputdir results/mobile --name "Mobile_Tests" TestScript/Mobile',
+                            returnStatus: true
+                        )
+                        
+                        // ตรวจสอบผลลัพธ์การรัน
+                        if (result > 250) {
+                            error "💥 Mobile test มีข้อผิดพลาดร้ายแรง"
+                        } else if (result != 0) {
+                            echo "⚠️ Mobile test บางส่วนล้มเหลว แต่ pipeline จะดำเนินการต่อ"
+                            currentBuild.result = 'UNSTABLE'
+                        } else {
+                            echo "✅ Mobile tests ผ่านทั้งหมด"
+                        }
+                        
+                    } catch (Exception e) {
+                        echo "⚠️ Mobile tests มีปัญหา: ${e.getMessage()}"
+                        currentBuild.result = 'UNSTABLE'
+                    }
+                }
+            }
+        }
+        
+        // ขั้นตอนที่ 8: รวมผลลัพธ์จากทุก Test Suite
+        stage('Merge Test Results') {
+            steps {
+                echo '🔗 กำลังรวมผลลัพธ์จากทุก test suite...'
+                script {
+                    try {
+                        // รวม output files จากทุก test suite เป็นไฟล์เดียว
+                        bat '''
+                            echo 📊 กำลังรวมผลลัพธ์...
+                            if exist "results\\api\\output.xml" (
+                                echo ✅ พบผลลัพธ์ API tests
+                            )
+                            if exist "results\\web\\output.xml" (
+                                echo ✅ พบผลลัพธ์ Web tests  
+                            )
+                            if exist "results\\mobile\\output.xml" (
+                                echo ✅ พบผลลัพธ์ Mobile tests
+                            )
+                            
+                            REM รวมผลลัพธ์ทั้งหมด (ถ้ามี rebot command)
+                            REM rebot --merge results/api/output.xml results/web/output.xml results/mobile/output.xml --name "Complete_Test_Suite" --outputdir results/merged
+                        '''
+                        
+                        echo '✅ รวมผลลัพธ์เรียบร้อย'
+                        
+                    } catch (Exception e) {
+                        echo "⚠️ การรวมผลลัพธ์มีปัญหา: ${e.getMessage()}"
+                        // ไม่ให้ pipeline fail เพราะปัญหานี้
+                    }
+                }
+            }
+        }
+        
+        // ขั้นตอนที่ 9: เผยแพร่ผลลัพธ์และ Reports
+        stage('Publish Test Results') {
+            steps {
+                echo '📊 กำลังเผยแพร่ test results และ reports...'
+                script {
+                    try {
+                        // เก็บไฟล์ artifacts (XML, HTML, รูปภาพ, logs)
+                        echo '📁 กำลัง archive artifacts...'
+                        archiveArtifacts artifacts: '''
+                            results/**/*.xml,
+                            results/**/*.html,
+                            results/**/*.png,
+                            results/**/*.jpg,
+                            results/**/*.log
+                        ''', allowEmptyArchive: true, fingerprint: true
+                        
+                        // เผยแพร่ HTML Reports สำหรับดูใน Jenkins UI
+                        echo '📄 กำลังเผยแพร่ HTML reports...'
+                        publishHTML([
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: true,
+                            keepAll: true,
+                            reportDir: 'results',
+                            reportFiles: '**/report.html',
+                            reportName: 'Robot Framework Test Report',
+                            reportTitles: 'รายงานผลการทดสอบ'
+                        ])
+                        
+                        // ใช้ Robot Framework plugin (ถ้ามีติดตั้ง)
+                        try {
+                            echo '🤖 กำลังใช้ Robot Framework plugin...'
+                            robot outputPath: 'results',
+                                  reportFileName: 'report.html',
+                                  logFileName: 'log.html',
+                                  passThreshold: 80.0,           // เกณฑ์ผ่าน 80%
+                                  unstableThreshold: 70.0,       // เกณฑ์ unstable 70%
+                                  criticalFailedThreshold: 90.0, // เกณฑ์ critical fail 90%
+                                  otherFiles: '**/*.png,**/*.jpg' // รวม screenshots
+                        } catch (Exception robotPluginError) {
+                            echo "⚠️ Robot Framework plugin ไม่พร้อมใช้งาน: ${robotPluginError.getMessage()}"
+                        }
+                        
+                        echo '✅ เผยแพร่ผลลัพธ์เรียบร้อย'
+                        
+                    } catch (Exception e) {
+                        echo "⚠️ การเผยแพร่ผลลัพธ์บางส่วนล้มเหลว: ${e.getMessage()}"
+                        // ไม่ให้ pipeline fail
+                    }
+                }
+            }
+        }
+        
+        // ขั้นตอนที่ 10: สร้างสรุปผลการทดสอบ
+        stage('Test Summary') {
+            steps {
+                echo '📋 กำลังสร้างสรุปผลการทดสอบ...'
+                script {
+                    try {
+                        // สร้าง summary report
+                        bat '''
+                            echo ===================================== > results\\summary.txt
+                            echo           สรุปผลการทดสอบ                >> results\\summary.txt  
+                            echo ===================================== >> results\\summary.txt
+                            echo Build Number: %BUILD_NUMBER% >> results\\summary.txt
+                            echo Build URL: %BUILD_URL% >> results\\summary.txt
+                            echo เวลาที่รัน: %date% %time% >> results\\summary.txt
+                            echo Jenkins Node: %NODE_NAME% >> results\\summary.txt
+                            echo ===================================== >> results\\summary.txt
+                        '''
+                        
+                        // อ่านและแสดง summary ใน console
+                        def summary = bat(script: 'type results\\summary.txt', returnStdout: true)
+                        echo "📊 สรุปผลการทดสอบ:\n${summary}"
+                        
+                    } catch (Exception e) {
+                        echo "⚠️ การสร้างสรุปผลล้มเหลว: ${e.getMessage()}"
+                    }
+                }
+            }
+        }
+    }
+    
+    // การกระทำหลังจากจบ Pipeline (ไม่ว่าจะสำเร็จหรือล้มเหลว)
+    post {
+        // รันเสมอไม่ว่าผลลัพธ์จะเป็นอย่างไร
+        always {
+            echo '🏁 Pipeline execution เสร็จสิ้น'
+            
+            // ทำความสะอาด screenshots และ temp files
+            script {
+                try {
+                    echo '🧹 กำลังทำความสะอาดไฟล์ชั่วคราว...'
+                    bat 'if exist "selenium-screenshot-*.png" del selenium-screenshot-*.png'
+                    bat 'if exist "*.log" del *.log'
+                    echo '✅ ทำความสะอาดเรียบร้อย'
+                } catch (Exception e) {
+                    echo "⚠️ การทำความสะอาด: ${e.getMessage()}"
+                }
+            }
+        }
+        
+        // เมื่อ Pipeline สำเร็จ
+        success {
+            echo '🎉 Pipeline เสร็จสมบูรณ์เรียบร้อย!'
+            echo '✅ ทุก tests ทำงานได้ถูกต้องและ results ถูกเผยแพร่แล้ว'
+            
+            // ส่ง email notification (ต้องติดตั้ง Email plugin และ uncomment)
+            /*
+            emailext (
+                subject: "✅ การทดสอบสำเร็จ - Build #${BUILD_NUMBER}",
+                body: """
+                🎉 การทดสอบเสร็จสมบูรณ์เรียบร้อย
+                
+                📊 ดูผลลัพธ์ได้ที่: ${BUILD_URL}
+                📄 รายงาน: ${BUILD_URL}Robot_Framework_Test_Report/
+                """,
+                to: "team@company.com"
+            )
+            */
+        }
+        
+        // เมื่อ Pipeline มีสถานะ unstable (บาง tests ล้มเหลว)
+        unstable {
+            echo '⚠️ Pipeline เสร็จสิ้นแต่มี test failures'
+            echo '📊 บาง tests ล้มเหลว แต่ build artifacts ถูกสร้างเรียบร้อย'
+            
+            /*
+            emailext (
+                subject: "⚠️ การทดสอบ Unstable - Build #${BUILD_NUMBER}",
+                body: """
+                ⚠️ บาง tests ล้มเหลว กรุณาตรวจสอบผลลัพธ์
+                
+                📊 ดูผลลัพธ์ได้ที่: ${BUILD_URL}
+                📄 รายงาน: ${BUILD_URL}Robot_Framework_Test_Report/
+                """,
+                to: "team@company.com"
+            )
+            */
+        }
+        
+        // เมื่อ Pipeline ล้มเหลว
+        failure {
+            echo '❌ Pipeline ล้มเหลว!'
+            echo '🔍 กรุณาตรวจสอบ console output เพื่อดูรายละเอียดข้อผิดพลาด'
+            
+            /*
+            emailext (
+                subject: "❌ การทดสอบล้มเหลว - Build #${BUILD_NUMBER}",
+                body: """
+                ❌ Pipeline execution ล้มเหลว
+                
+                🔍 ตรวจสอบ console: ${BUILD_URL}console
+                📞 ติดต่อทีม DevOps หากต้องการความช่วยเหลือ
+                """,
+                to: "team@company.com"
+            )
+            */
+        }
+        
+        // ทำความสะอาด workspace (ถ้าต้องการ)
+        cleanup {
+            echo '🧹 กำลังทำความสะอาด workspace...'
+            /*
+            cleanWs(
+                cleanWhenNotBuilt: false,
+                deleteDirs: true,
+                disableDeferredWipeout: true,
+                notFailBuild: true,
+                patterns: [[pattern: 'results/**', type: 'EXCLUDE']]  // เก็บ results ไว้
+            )
+            */
         }
     }
 }

@@ -1,4 +1,17 @@
-robotframework
-robotframework-seleniumlibrary
-robotframework-appiumlibrary
-robotframework-requests
+# Robot Framework Core
+robotframework==7.2.2
+
+# Web Testing Libraries
+robotframework-seleniumlibrary==6.7.0
+selenium==4.16.0
+
+# Mobile Testing Libraries  
+robotframework-appiumlibrary==2.1.0
+Appium-Python-Client==2.11.1
+
+# API Testing Libraries
+robotframework-requests==0.9.7
+requests==2.32.2
+
+# Data Libraries
+pyyaml==6.0.2  # สำหรับอ่าน YAML config files
