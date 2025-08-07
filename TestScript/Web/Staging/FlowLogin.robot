@@ -89,4 +89,27 @@ Login Password Not Found
     LoginPageWeb.Click Login Button
     LoginPageWeb.Validate Popup Message   expect=${_PASSWORD_ERROR_TEXT}
 
+Login Password Not Found Fail
+    [Documentation]    Owner : Danai Lertkamjornwat
+    ...           |    ***| Description |***
+    ...           |    ตรวจสอบเข้าสู่ระบบไม่สำเร็จกรณีระบุ Password ผิด
+    ...           --------------------------------------------------------------------------
+    ...           |    ***| Test Step |***
+    ...           |    1. เปิดเว็บไซต์
+    ...           |    2. ระบุ Username
+    ...           |    3. ระบุ Password
+    ...           |    4. คลิกปุ่ม Login
+    ...           |    5. ไม่สามารถเข้าสู่ระบบได้
+    ...           |    6. ปิด Browser
+    ...           --------------------------------------------------------------------------
+    ...           |    ***| Expected Result |***
+    ...           |    ต้องเข้าสู่ระบบได้ถูกต้อง
+    ...           ==> 
+    [Tags]    fail
+    LoginPageWeb.Open Web Browser    url=${_URL}    browser=${_BROWSER}
+    LoginPageWeb.Input Username    username=${_USERNAME}
+    LoginPageWeb.Input Password    password=${_PASSWORD}
+    LoginPageWeb.Click Login Button
+    LoginPageWeb.Validate Popup Message   expect=${_PASSWORD_ERROR_TEXT}
+
 
