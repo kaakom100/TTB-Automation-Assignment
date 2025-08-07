@@ -188,27 +188,27 @@ jobs:
                   
                   # สร้าง Markdown สำหรับ GitHub Summary
                   with open('test_summary.md', 'w', encoding='utf-8') as f:
-                  f.write(f"# {status_emoji} Web Test Results\n\n")
-                  f.write("## 📊 Summary\n\n")
-                  f.write("| Status | Count | Test Names | Percentage |\n")
-                  f.write("|--------|-------|------------|------------|\n")
-                  
-                  # Test ที่ผ่าน
-                  passed_list = "<br>".join(passed_tests) if passed_tests else "-"
-                  f.write(f"| ✅ **Passed** | **{passed}** | {passed_list} | **{pass_percentage:.2f}%** |\n")
-                  
-                  # Test ที่ไม่ผ่าน (แค่ชื่อ ถ้าต้องการ error เพิ่มเติมก็บอกได้)
-                  failed_list = ""
-                  if failed > 0:
-                      # เอาแต่ชื่อ (ไม่เอาข้อความ Error) กรณี failed_tests มีชื่อ+error สลับกัน
-                      failed_names = [failed_tests[i] for i in range(0, len(failed_tests), 2)]
-                      failed_list = "<br>".join(failed_names)
-                      f.write(f"| ❌ **Failed** | **{failed}** | {failed_list} | **{fail_percentage:.2f}%** |\n")
-                  
-                  # ถ้ามี Skipped (ไม่บ่อย)
-                  if skipped > 0:
-                      skip_percentage = (skipped / total * 100)
-                      f.write(f"| ⏭️ **Skipped** | **{skipped}** | - | **{skip_percentage:.2f}%** |\n")
+                      f.write(f"# {status_emoji} Web Test Results\n\n")
+                      f.write("## 📊 Summary\n\n")
+                      f.write("| Status | Count | Test Names | Percentage |\n")
+                      f.write("|--------|-------|------------|------------|\n")
+                      
+                      # Test ที่ผ่าน
+                      passed_list = "<br>".join(passed_tests) if passed_tests else "-"
+                      f.write(f"| ✅ **Passed** | **{passed}** | {passed_list} | **{pass_percentage:.2f}%** |\n")
+                      
+                      # Test ที่ไม่ผ่าน (แค่ชื่อ ถ้าต้องการ error เพิ่มเติมก็บอกได้)
+                      failed_list = ""
+                      if failed > 0:
+                          # เอาแต่ชื่อ (ไม่เอาข้อความ Error) กรณี failed_tests มีชื่อ+error สลับกัน
+                          failed_names = [failed_tests[i] for i in range(0, len(failed_tests), 2)]
+                          failed_list = "<br>".join(failed_names)
+                          f.write(f"| ❌ **Failed** | **{failed}** | {failed_list} | **{fail_percentage:.2f}%** |\n")
+                      
+                      # ถ้ามี Skipped (ไม่บ่อย)
+                      if skipped > 0:
+                          skip_percentage = (skipped / total * 100)
+                          f.write(f"| ⏭️ **Skipped** | **{skipped}** | - | **{skip_percentage:.2f}%** |\n")
                   
                   f.write(f"| 📊 **Total** | **{total}** | - | **100.00%** |\n\n")
                   # with open('test_summary.md', 'w') as f:
