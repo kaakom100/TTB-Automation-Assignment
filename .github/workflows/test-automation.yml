@@ -188,11 +188,13 @@ jobs:
                       # Total (รวมชื่อทั้ง Passed/Failed พร้อมไอคอน)
                       all_names_md = ""
                       if passed_details:
-                          all_names_md += "<br>".join([f"✅ {t['name']}" for t in passed_details])
+                          if all_names_md:
+                              all_names_md += "<br>✅ Pass<br>"
+                          all_names_md += "<br>".join([f"{t['name']}" for t in passed_details])
                       if failed_details:
                           if all_names_md:
-                              all_names_md += "<br>---<br>"
-                          all_names_md += "<br>".join([f"❌ {t['name']}" for t in failed_details])
+                              all_names_md += "<br>❌ Fail<br>"
+                          all_names_md += "<br>".join([f"{t['name']}" for t in failed_details])
                       if not all_names_md:
                           all_names_md = "-"
                       f.write(f"| 📊 **Total** | **{total}** | {all_names_md} | **100.00%** |\n\n")
