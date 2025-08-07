@@ -18,22 +18,21 @@ jobs:
   setup-job:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup code & Python
+      - name: Checkout code
         uses: actions/checkout@v4
-      - name: Install Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12.4'
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
 
   test-api:
     needs: setup-job
     runs-on: ubuntu-latest
     steps:
-      - name: Copy repo from setup
+      - name: Checkout code
         uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.4'
+      - name: Install Robot Framework
+        run: pip install -r requirements.txt
       - name: Run API Test
         run: |
           mkdir -p results
@@ -43,8 +42,14 @@ jobs:
     needs: setup-job
     runs-on: ubuntu-latest
     steps:
-      - name: Copy repo from setup
+      - name: Checkout code
         uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.4'
+      - name: Install Robot Framework
+        run: pip install -r requirements.txt
       - name: Run Web Test
         run: |
           mkdir -p results
