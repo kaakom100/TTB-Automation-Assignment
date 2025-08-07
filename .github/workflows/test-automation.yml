@@ -167,7 +167,7 @@ jobs:
                       f.write("| Status | Count | Test Case Name | Percentage |\n")
                       f.write("|--------|-------|------------|------------|\n")
                       
-                      # แสดงรายชื่อ Passed Tests
+                      # Passed (แสดงรายชื่อ Passed Tests)
                       if passed > 0:
                           # รวมชื่อ test ทั้งหมดในบรรทัดเดียว ใช้ <br> คั่น
                           passed_list = "<br>".join(passed_tests) if passed_tests else "-"
@@ -175,7 +175,7 @@ jobs:
                       else:
                           f.write(f"| ✅ **Passed** | **0** | - | **0.00%** |\n")
                       
-                      # แสดงรายชื่อ Failed Tests พร้อม error
+                      # Fail (แสดงรายชื่อ Failed Tests พร้อม error)
                       if failed > 0:
                           failed_info = []
                           for detail in failed_details:
@@ -185,7 +185,7 @@ jobs:
                       else:
                           f.write(f"| ❌ **Failed** | **0** | - | **0.00%** |\n")
 
-                      # Total (รวมชื่อทั้ง Passed/Failed พร้อมไอคอน)
+                      # Total (แยก Passed/Failed พร้อมไอคอน)
                       all_names_md = ""
                       if passed_details:
                           all_names_md += "<b>✅ Passed</b><br>"
@@ -202,20 +202,7 @@ jobs:
                       if not all_names_md.strip():
                           all_names_md = "-"
                       f.write(f"| 📊 **Total** | **{total}** | {all_names_md} | **100.00%** |\n\n")
-                      # แล้วเอา total_md ไปใส่ใน markdown table
-                      #f.write(f"| 📊 Total | **{total}** | {total_md} | **100.00%** |\n\n")
-                      # all_names = (
-                      #     [f"✅ {d['name']}" for d in passed_details] +
-                      #     [f"❌ {d['name']}" for d in failed_details]
-                      # )
-                      # all_names_md = "<br>".join(all_names) if all_names else "-"
-                      # f.write(f"| 📊 Total | **{total}** | {all_names_md} | **100.00%** |\n\n")
-
-                      # # Total (รวมชื่อทั้ง Passed/Failed)
-                      # all_names = [t['name'] for t in passed_details] + [t['name'] for t in failed_details]
-                      # all_names_md = "<br>".join(all_names) if all_names else "-"         
-                      # f.write(f"| 📊 Total | **{total}** | {all_names_md} | **100.00%** |\n\n")                  
-                  
+                      
                   print("\n✅ Summary files created successfully!")
                   
               except Exception as e:
@@ -230,7 +217,6 @@ jobs:
           # รัน script วิเคราะห์ผล
           python analyze_results.py
       
-
       - name: 📝 Update GitHub Job Summary
         if: always()
         run: |
@@ -253,11 +239,15 @@ jobs:
             echo "⚠️ No test summary available" >> $GITHUB_STEP_SUMMARY
           fi
       
+      - name: Set current date and time
+        id: set-datetime
+        run: echo "datetime=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_OUTPUT
+
       - name: 📁 Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ github.run_number }}
+          name: test-results-${{ steps.set-datetime.outputs.datetime }}
           path: results/
           retention-days: 30
                 
