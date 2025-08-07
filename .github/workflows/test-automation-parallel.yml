@@ -22,12 +22,12 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python
+      - name: 📥 Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12.4'
 
-      - name: Install Robot Framework
+      - name: 📥 Install Robot Framework
         run: |
           pip install -r requirements.txt
 
@@ -53,12 +53,12 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python
+      - name: 📥 Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12.4'
 
-      - name: Install Robot Framework
+      - name: 📥 Install Robot Framework
         run: |
           pip install -r requirements.txt
 
@@ -80,10 +80,17 @@ jobs:
     needs: [test-api, test-web]
     runs-on: ubuntu-latest
     steps:
-      - name: Print summary
-        run: echo "Summary step"
+      - name: Download Web Test Results
+        uses: actions/download-artifact@v4
+        with:
+          name: web-results
+          path: web-results/
+      - name: Download API Test Results
+        uses: actions/download-artifact@v4
+        with:
+          name: api-results
+          path: api-results/
 
-      
       # ============================================
       # STEP 3: Generate Test Report
       # ============================================

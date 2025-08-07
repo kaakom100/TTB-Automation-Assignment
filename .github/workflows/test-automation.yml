@@ -30,13 +30,13 @@
 #         uses: actions/checkout@v4
       
 #       # ขั้นตอนที่ 2: ติดตั้ง Python
-#       - name: 🐍 Setup Python
+#       - name: 📥 Setup Python
 #         uses: actions/setup-python@v4
 #         with:
 #           python-version: '3.12.4'
       
 #       # ขั้นตอนที่ 3: ติดตั้ง Robot Framework
-#       - name: Install Robot Framework
+#       - name: 📥 Install Robot Framework
 #         run: |
 #           pip install -r requirements.txt
 
