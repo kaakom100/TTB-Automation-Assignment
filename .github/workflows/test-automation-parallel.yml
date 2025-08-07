@@ -174,207 +174,105 @@ jobs:
           def parse_xml(xml_path, test_type):
               """Parse Robot Framework XML and extract test details"""
               if not os.path.exists(xml_path):
-                  print(f"⚠️ {test_type} results not found at {xml_path}")
                   return None
                   
-              try:
-                  tree = ET.parse(xml_path)
-                  root = tree.getroot()
-                  
-                  stats = root.find('.//statistics/total/stat')
-                  passed = int(stats.get('pass', 0))
-                  failed = int(stats.get('fail', 0))
-                  total = passed + failed
-                  
-                  # Extract test details
-                  passed_tests = []
-                  failed_tests = []
-                  
-                  for suite in root.findall('.//suite'):
-                      for test in suite.findall('.//test'):
-                          name = test.get('name', 'Unknown')
-                          status = test.find('./status').get('status')
-                          
-                          if status == 'PASS':
-                              passed_tests.append(name)
-                          elif status == 'FAIL':
-                              msg_node = test.find('./status')
-                              error_msg = ""
-                              if msg_node is not None and msg_node.text:
-                                  error_msg = msg_node.text.strip().replace('\n', ' ')[:100]
-                              failed_tests.append({
-                                  'name': name,
-                                  'error': error_msg
-                              })
-                  
-                  return {
-                      'passed': passed,
-                      'failed': failed,
-                      'total': total,
-                      'pass_rate': round((passed/total*100), 2) if total > 0 else 0,
-                      'passed_tests': passed_tests,
-                      'failed_tests': failed_tests
-                  }
-              except Exception as e:
-                  print(f"❌ Error parsing {test_type} results: {e}")
-                  return None
-
+              tree = ET.parse(xml_path)
+              root = tree.getroot()
+              
+              stats = root.find('.//statistics/total/stat')
+              passed = int(stats.get('pass', 0))
+              failed = int(stats.get('fail', 0))
+              total = passed + failed
+              
+              # Extract test details
+              tests = []
+              for suite in root.findall('.//suite'):
+                  for test in suite.findall('.//test'):
+                      name = test.get('name', 'Unknown')
+                      status = test.find('./status').get('status')
+                      
+                      # Get error message if failed
+                      error_msg = ""
+                      if status == 'FAIL':
+                          msg_node = test.find('./status')
+                          if msg_node is not None and msg_node.text:
+                              error_msg = msg_node.text.strip()[:100]  # Limit error message length
+                      
+                      tests.append({
+                          'name': name,
+                          'status': status,
+                          'error': error_msg,
+                          'type': test_type
+                      })
+              
+              return {
+                  'passed': passed,
+                  'failed': failed,
+                  'total': total,
+                  'pass_rate': round((passed/total*100), 2) if total > 0 else 0,
+                  'tests': tests
+              }
+          
           # Parse both test results
           web_results = parse_xml('web-results/output.xml', 'Web')
           api_results = parse_xml('api-results/output.xml', 'API')
-
+          
           # Calculate combined statistics
           total_passed = (web_results['passed'] if web_results else 0) + (api_results['passed'] if api_results else 0)
           total_failed = (web_results['failed'] if web_results else 0) + (api_results['failed'] if api_results else 0)
           total_tests = total_passed + total_failed
           overall_pass_rate = round((total_passed/total_tests*100), 2) if total_tests > 0 else 0
-
+          
           # Generate Markdown report
           with open('test_summary.md', 'w', encoding='utf-8') as f:
               # Header with overall status
-              if total_tests == 0:
-                  f.write("# ⚠️ No Test Results Found\n\n")
-                  f.write("Please check the test configuration and logs.\n")
-              elif overall_pass_rate == 100:
+              if overall_pass_rate == 100:
                   f.write("# ✅ All Tests Passed!\n\n")
-              elif overall_pass_rate >= 80:
-                  f.write("# 🎯 Tests Mostly Passed\n\n")
-              elif overall_pass_rate >= 50:
-                  f.write("# ⚠️ Some Tests Failed\n\n")
+              elif overall_pass_rate == 0:
+                  f.write("# ❌ All Tests Failed!\n\n")
               else:
-                  f.write("# ❌ Many Tests Failed\n\n")
+                  f.write("# ⚠️ Test Summary\n\n")
               
               # Overall Summary
               f.write("## 📊 Overall Summary\n\n")
               f.write(f"**Total Pass Rate:** {overall_pass_rate}% ({total_passed}/{total_tests})\n\n")
               
-              # Test Breakdown by Type with Test Cases
+              # Test Type Breakdown
               f.write("## 📈 Test Breakdown by Type\n\n")
-              f.write("| Test Type | Passed | Failed | Total | Pass Rate | Test Cases |\n")
-              f.write("|:----------|:------:|:------:|:-----:|----------:|:-----------|")
-              f.write("\n")
+              f.write("| Test Type | Passed | Failed | Total | Pass Rate |\n")
+              f.write("|-----------|--------|--------|-------|----------|\n")
               
-              # Web Tests Row with test cases
+              # Web Tests Row
               if web_results:
-                  # Format test cases for table cell
-                  test_cases_list = []
-                  
-                  if web_results['passed_tests']:
-                      test_cases_list.append("**✅ Passed:**")
-                      for test in web_results['passed_tests']:
-                          test_cases_list.append(f"• {test}")
-                  
-                  if web_results['failed_tests']:
-                      if test_cases_list:
-                          test_cases_list.append("")  # Empty line between sections
-                      test_cases_list.append("**❌ Failed:**")
-                      for test in web_results['failed_tests']:
-                          test_cases_list.append(f"• {test['name']}")
-                  
-                  # Join with <br> for HTML line breaks in GitHub Markdown
-                  test_cases_str = "<br>".join(test_cases_list) if test_cases_list else "No tests"
-                  
-                  f.write(f"| **Web Tests** | {web_results['passed']} | {web_results['failed']} | ")
-                  f.write(f"{web_results['total']} | **{web_results['pass_rate']}%** | {test_cases_str} |\n")
+                  f.write(f"| **Web Tests** | {web_results['passed']} | {web_results['failed']} | {web_results['total']} | **{web_results['pass_rate']}%** |\n")
               else:
-                  f.write("| **Web Tests** | - | - | - | **N/A** | No tests executed |\n")
+                  f.write("| **Web Tests** | ⏭️ | - | - | - | **N/A** |\n")
               
-              # API Tests Row with test cases
+              # API Tests Row
               if api_results:
-                  # Format test cases for table cell
-                  test_cases_list = []
-                  
-                  if api_results['passed_tests']:
-                      test_cases_list.append("**✅ Passed:**")
-                      for test in api_results['passed_tests']:
-                          test_cases_list.append(f"• {test}")
-                  
-                  if api_results['failed_tests']:
-                      if test_cases_list:
-                          test_cases_list.append("")  # Empty line between sections
-                      test_cases_list.append("**❌ Failed:**")
-                      for test in api_results['failed_tests']:
-                          test_cases_list.append(f"• {test['name']}")
-                  
-                  # Join with <br> for HTML line breaks
-                  test_cases_str = "<br>".join(test_cases_list) if test_cases_list else "No tests"
-                  
-                  f.write(f"| **API Tests** | {api_results['passed']} | {api_results['failed']} | ")
-                  f.write(f"{api_results['total']} | **{api_results['pass_rate']}%** | {test_cases_str} |\n")
+                  f.write(f"| **API Tests** | {api_results['passed']} | {api_results['failed']} | {api_results['total']} | **{api_results['pass_rate']}%** |\n")
               else:
-                  f.write("| **API Tests** | - | - | - | **N/A** | No tests executed |\n")
+                  f.write("| **API Tests** | ⏭️ | - | - | - | **N/A** |\n")
               
               # Total Row
-              total_status = '✅' if overall_pass_rate == 100 else '⚠️' if overall_pass_rate >= 50 else '❌'
-              all_test_count = 0
-              
-              # Count all tests for summary
-              if web_results:
-                  all_test_count += len(web_results['passed_tests']) + len(web_results['failed_tests'])
-              if api_results:
-                  all_test_count += len(api_results['passed_tests']) + len(api_results['failed_tests'])
-              
-              f.write(f"| **TOTAL** | **{total_passed}** | **{total_failed}** | **{total_tests}** | ")
-              f.write(f"**{overall_pass_rate}%** | {total_status} Total {all_test_count} test cases |\n\n")
-              
-              # Failed Tests Details Section (if any) - Optional expanded view
-              all_failed = []
-              if web_results:
-                  all_failed.extend([{'type': 'Web', **t} for t in web_results['failed_tests']])
-              if api_results:
-                  all_failed.extend([{'type': 'API', **t} for t in api_results['failed_tests']])
-              
-              if all_failed:
-                  f.write("## ❌ Failed Tests Details\n\n")
-                  f.write("<details>\n")
-                  f.write("<summary>Click to view error details</summary>\n\n")
-                  f.write("| # | Type | Test Name | Error Message |\n")
-                  f.write("|:--|:-----|:----------|:--------------|\n")
-                  for i, test in enumerate(all_failed, 1):
-                      error = test['error'][:60] + "..." if len(test['error']) > 60 else test['error']
-                      error = error.replace('|', '\\|').replace('\n', ' ')
-                      f.write(f"| {i} | {test['type']} | {test['name']} | {error} |\n")
-                  f.write("\n</details>\n\n")
-              
+              f.write(f"| **TOTAL** | **{total_passed}** | **{total_failed}** | **{total_tests}** | **{overall_pass_rate}%** |\n\n")
+                       
               # Execution Details
               f.write("## 📝 Execution Details\n\n")
               f.write(f"- **Execution Time:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}\n")
               f.write(f"- **Branch:** ${{ github.ref_name }}\n")
-              f.write(f"- **Commit:** ${{ github.sha }}\n")
               f.write(f"- **Triggered by:** @${{ github.actor }}\n")
               f.write(f"- **Workflow:** ${{ github.workflow }}\n")
-
-          # Console output for debugging
+              
           print("\n" + "="*60)
-          print("📊 TEST EXECUTION SUMMARY")
+          print("📊 COMBINED TEST RESULTS")
           print("="*60)
-          print(f"Overall Pass Rate: {overall_pass_rate}% ({total_passed}/{total_tests})")
+          print(f"Web Tests:  {web_results['passed'] if web_results else 0}/{web_results['total'] if web_results else 0} passed")
+          print(f"API Tests:  {api_results['passed'] if api_results else 0}/{api_results['total'] if api_results else 0} passed")
           print("-"*60)
-
-          if web_results:
-              print(f"\n🌐 Web Tests: {web_results['pass_rate']}% ({web_results['passed']}/{web_results['total']})")
-              if web_results['passed_tests']:
-                  print("  ✅ Passed:")
-                  for test in web_results['passed_tests']:
-                      print(f"     - {test}")
-              if web_results['failed_tests']:
-                  print("  ❌ Failed:")
-                  for test in web_results['failed_tests']:
-                      print(f"     - {test['name']}")
-
-          if api_results:
-              print(f"\n🔌 API Tests: {api_results['pass_rate']}% ({api_results['passed']}/{api_results['total']})")
-              if api_results['passed_tests']:
-                  print("  ✅ Passed:")
-                  for test in api_results['passed_tests']:
-                      print(f"     - {test}")
-              if api_results['failed_tests']:
-                  print("  ❌ Failed:")
-                  for test in api_results['failed_tests']:
-                      print(f"     - {test['name']}")
-
+          print(f"TOTAL:      {total_passed}/{total_tests} passed ({overall_pass_rate}%)")
           print("="*60)
-          print("\n✅ Report generated successfully!")
+          EOF
           
           python generate_report.py
       
