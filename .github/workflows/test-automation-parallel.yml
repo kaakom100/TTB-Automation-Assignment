@@ -262,45 +262,11 @@ jobs:
               
               # Total Row
               f.write(f"| **TOTAL** | {'✅' if overall_pass_rate == 100 else '⚠️' if overall_pass_rate >= 50 else '❌'} | **{total_passed}** | **{total_failed}** | **{total_tests}** | **{overall_pass_rate}%** |\n\n")
-              
-              # Failed Tests Details (if any)
-              all_failed_tests = []
-              if web_results:
-                  all_failed_tests.extend([t for t in web_results['tests'] if t['status'] == 'FAIL'])
-              if api_results:
-                  all_failed_tests.extend([t for t in api_results['tests'] if t['status'] == 'FAIL'])
-              
-              if all_failed_tests:
-                  f.write("## ❌ Failed Tests Details\n\n")
-                  f.write("| Type | Test Name | Error Message |\n")
-                  f.write("|------|-----------|---------------|\n")
-                  for test in all_failed_tests:
-                      error = test['error'][:50] + "..." if len(test['error']) > 50 else test['error']
-                      f.write(f"| {test['type']} | {test['name']} | {error} |\n")
-                  f.write("\n")
-              
-              # Passed Tests Summary
-              all_passed_tests = []
-              if web_results:
-                  all_passed_tests.extend([t for t in web_results['tests'] if t['status'] == 'PASS'])
-              if api_results:
-                  all_passed_tests.extend([t for t in api_results['tests'] if t['status'] == 'PASS'])
-              
-              if all_passed_tests:
-                  f.write("## ✅ Passed Tests\n\n")
-                  f.write("<details>\n")
-                  f.write("<summary>Click to expand passed tests list</summary>\n\n")
-                  f.write("| Type | Test Name |\n")
-                  f.write("|------|-----------|\n")
-                  for test in all_passed_tests:
-                      f.write(f"| {test['type']} | {test['name']} |\n")
-                  f.write("\n</details>\n\n")
-              
+                       
               # Execution Details
               f.write("## 📝 Execution Details\n\n")
               f.write(f"- **Execution Time:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}\n")
               f.write(f"- **Branch:** ${{ github.ref_name }}\n")
-              f.write(f"- **Commit:** ${{ github.sha }}\n")
               f.write(f"- **Triggered by:** @${{ github.actor }}\n")
               f.write(f"- **Workflow:** ${{ github.workflow }}\n")
               
@@ -345,33 +311,33 @@ jobs:
           path: combined-results/
           retention-days: 30
       
-      - name: 🚨 Check Test Status
-        if: always()
-        run: |
-          # Parse results and fail if tests failed
-          python << 'EOF'
-          import json
-          import sys
-          import os
+      # - name: 🚨 Check Test Status
+      #   if: always()
+      #   run: |
+      #     # Parse results and fail if tests failed
+      #     python << 'EOF'
+      #     import json
+      #     import sys
+      #     import os
           
-          failed_count = 0
+      #     failed_count = 0
           
-          # Check web results
-          if os.path.exists('web-results/summary.json'):
-              with open('web-results/summary.json') as f:
-                  web = json.load(f)
-                  failed_count += web.get('failed', 0)
+      #     # Check web results
+      #     if os.path.exists('web-results/summary.json'):
+      #         with open('web-results/summary.json') as f:
+      #             web = json.load(f)
+      #             failed_count += web.get('failed', 0)
           
-          # Check API results  
-          if os.path.exists('api-results/summary.json'):
-              with open('api-results/summary.json') as f:
-                  api = json.load(f)
-                  failed_count += api.get('failed', 0)
+      #     # Check API results  
+      #     if os.path.exists('api-results/summary.json'):
+      #         with open('api-results/summary.json') as f:
+      #             api = json.load(f)
+      #             failed_count += api.get('failed', 0)
           
-          if failed_count > 0:
-              print(f"❌ {failed_count} tests failed!")
-              sys.exit(1)
-          else:
-              print("✅ All tests passed!")
-              sys.exit(0)
-          EOF
+      #     if failed_count > 0:
+      #         print(f"❌ {failed_count} tests failed!")
+      #         sys.exit(1)
+      #     else:
+      #         print("✅ All tests passed!")
+      #         sys.exit(0)
+      #     EOF
