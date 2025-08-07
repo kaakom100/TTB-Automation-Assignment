@@ -153,15 +153,12 @@ jobs:
                       if pass_percentage == 100:
                           f.write("# ✅ All Tests Passed!\n\n")
                           status_emoji = "✅"
-                      elif pass_percentage >= 80:
-                          f.write("# ✅ Web Test Results\n\n")
-                          status_emoji = "✅"
-                      elif pass_percentage >= 60:
-                          f.write("# ⚠️ Web Test Results\n\n")
-                          status_emoji = "⚠️"
-                      else:
-                          f.write("# ❌ Web Test Results\n\n")
+                      elif pass_percentage == 0:
+                          f.write("# ❌ All Tests Failed!\n\n")
                           status_emoji = "❌"
+                      else:
+                          f.write("# ⚠️ Test Summary\n\n")
+                          status_emoji = "⚠️"
                       
                       f.write("## 📊 Summary\n\n")
                       f.write("| Status | Count | Test Names | Percentage |\n")
@@ -233,17 +230,3 @@ jobs:
           path: results/
           retention-days: 30
                 
-
-                              # # หรือถ้าอยากแสดงแบบแยก section
-                      # if passed_tests:
-                      #     f.write("### ✅ Passed Tests:\n")
-                      #     for test in passed_tests:
-                      #         f.write(f"- {test}\n")
-                      #     f.write("\n")
-                      
-                      # if failed_tests:
-                      #     f.write("### ❌ Failed Tests:\n")
-                      #     for detail in failed_details:
-                      #         f.write(f"- **{detail['name']}**\n")
-                      #         f.write(f"  - Error: `{detail['error']}`\n")
-                      #     f.write("\n")
