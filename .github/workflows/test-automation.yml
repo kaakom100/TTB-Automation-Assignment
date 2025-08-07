@@ -46,15 +46,15 @@ jobs:
       - name: รันเทส Web
         run: |
           # สร้างโฟลเดอร์เก็บผล
-          mkdir results
+          mkdir -p results
           
-          # รันเทส
-          robot --outputdir results TestScript/Web/ || true
+          # รันเทสตรงๆ ที่ไฟล์ FlowLogin.robot
+          robot --outputdir results TestScript/Web/Staging/FlowLogin.robot || true
       
       # ขั้นตอนที่ 5: เก็บผลไว้ดู
       - name: เก็บผลการทดสอบ
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: results/
