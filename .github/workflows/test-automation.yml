@@ -174,6 +174,7 @@ jobs:
                       f.write("| Status | Count | Test Names | Percentage |\n")
                       f.write("|--------|-------|------------|------------|\n")
                       
+                      # รายชื่อ test ที่ผ่าน
                       passed_list = "<br>".join(passed_tests) if passed_tests else "-"
                       f.write(f"| ✅ **Passed** | **{passed}** | {passed_list} | **{pass_percentage:.2f}%** |\n")
                       
@@ -183,21 +184,23 @@ jobs:
                           for i in range(0, len(failed_tests), 2):
                               name = failed_tests[i]
                               if i + 1 < len(failed_tests):
-                                  error = failed_tests[i + 1][10:]
+                                  error = failed_tests[i + 1][10:]  # ตัด '  └─ Error: ' ข้างหน้า
                               else:
                                   error = ""
                               failed_pairs.append(f"{name} <br><span style='color:#b33'>• {error}</span>")
                           failed_list = "<br><br>".join(failed_pairs)
-                          f.write(f"| ❌ **Failed** | **{failed}** | {failed_list} | **{fail_percentage:.2f}%** |\n")            
+                          f.write(f"| ❌ **Failed** | **{failed}** | {failed_list} | **{fail_percentage:.2f}%** |\n")
+
+                      # รวมทั้งหมด
                       f.write(f"| 📊 **Total** | **{total}** | - | **100.00%** |\n\n")
                   
                   print("\n✅ Summary files created successfully!")
                   
-                  # # Set output variables for GitHub Actions
-                  # print(f"::set-output name=total::{total}")
-                  # print(f"::set-output name=passed::{passed}")
-                  # print(f"::set-output name=failed::{failed}")
-                  # print(f"::set-output name=pass_rate::{pass_percentage:.2f}")
+                  # Set output variables for GitHub Actions
+                  print(f"::set-output name=total::{total}")
+                  print(f"::set-output name=passed::{passed}")
+                  print(f"::set-output name=failed::{failed}")
+                  print(f"::set-output name=pass_rate::{pass_percentage:.2f}")
                   
               except Exception as e:
                   print(f"❌ Error analyzing results: {str(e)}")
