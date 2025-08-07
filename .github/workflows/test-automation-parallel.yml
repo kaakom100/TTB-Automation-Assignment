@@ -17,6 +17,7 @@ on:
 jobs:
   # งานที่ 1: Web Test
   test-web:
+    needs: test-api  # <--- ให้ web รันหลัง api เสมอ
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
@@ -48,7 +49,6 @@ jobs:
 
   # งานที่ 2: API Test
   test-api:
-    needs: test-api  # <--- ให้ web รันหลัง api เสมอ
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
