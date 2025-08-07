@@ -15,22 +15,18 @@ on:
 
 # งานที่จะทำ
 jobs:
-  # งานที่ 1: Web Test
   test-web:
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-
       - name: 📥 Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12.4'
-
       - name: 📥 Install Robot Framework
         run: |
           pip install -r requirements.txt
-
       - name: 🧪 Run Web Tests Only
         run: |
           mkdir -p results
@@ -42,26 +38,24 @@ jobs:
             --report report.html \
             --name "Web Tests" \
             TestScript/Web/Staging/FlowLogin.robot || true
-          echo "================================"
-          echo "Test execution completed with exit code: ${EXIT_CODE:-0}"
-          echo "================================"
+      - name: Upload Web Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-results
+          path: results/
 
-  # งานที่ 2: API Test
   test-api:
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-
       - name: 📥 Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12.4'
-
       - name: 📥 Install Robot Framework
         run: |
           pip install -r requirements.txt
-
       - name: 🧪 Run API Tests Only
         run: |
           mkdir -p results
@@ -72,9 +66,11 @@ jobs:
             --report report.html \
             --name "API Tests" \
             TestScript/API/API.robot || true
-          echo "================================"
-          echo "Test execution completed with exit code: ${EXIT_CODE:-0}"
-          echo "================================"
+      - name: Upload API Test Results        # <<== ต้องเป็น upload!
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-results
+          path: results/
 
   summary:
     needs: [test-api, test-web]
