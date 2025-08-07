@@ -137,22 +137,38 @@ jobs:
                   print("\n" + "="*60)
                   print("📋 TEST DETAILS")
                   print("="*60)
-                  
+
                   passed_tests = []
                   failed_tests = []
-                  
                   for test in root.findall('.//test'):
                       test_name = test.get('name', 'Unknown')
                       test_status = test.get('status', 'UNKNOWN')
-                      
                       if test_status == 'PASS':
                           passed_tests.append(test_name)
                       elif test_status == 'FAIL':
                           failed_tests.append(test_name)
-                          # หา error message
                           msg = test.find('.//msg[@level="FAIL"]')
                           error_msg = msg.text if msg is not None and msg.text else "No error message"
                           failed_tests.append(f"  └─ Error: {error_msg[:100]}")
+
+                  print("Passed tests =", passed_tests)
+                  print("Failed tests =", failed_tests)
+                  
+                  # passed_tests = []
+                  # failed_tests = []
+                  
+                  # for test in root.findall('.//test'):
+                  #     test_name = test.get('name', 'Unknown')
+                  #     test_status = test.get('status', 'UNKNOWN')
+                      
+                  #     if test_status == 'PASS':
+                  #         passed_tests.append(test_name)
+                  #     elif test_status == 'FAIL':
+                  #         failed_tests.append(test_name)
+                  #         # หา error message
+                  #         msg = test.find('.//msg[@level="FAIL"]')
+                  #         error_msg = msg.text if msg is not None and msg.text else "No error message"
+                  #         failed_tests.append(f"  └─ Error: {error_msg[:100]}")
                   
                   # แสดง Passed Tests
                   if passed_tests:
@@ -215,31 +231,7 @@ jobs:
                       f.write(f"| 📊 **Total** | **{total}** | - | **100.00%** |\n\n")
                   
                   f.write(f"| 📊 **Total** | **{total}** | - | **100.00%** |\n\n")
-                  # with open('test_summary.md', 'w') as f:
-                  #     f.write(f"# {status_emoji} Web Test Results\n\n")
-                      
-                  #     # ตารางสรุป
-                  #     f.write("## 📊 Summary\n\n")
-                  #     f.write("| Status | Count | Test Names | Percentage |\n")
-                  #     f.write("|--------|-------|-----------------------------|------------|\n")
-                      
-                  #     # Progress bar สำหรับ Pass
-                  #     f.write(f"| ✅ **Passed** | **{passed}** | **{pass_percentage:.2f}%** |\n")
-                      
-                  #     # Progress bar สำหรับ Fail
-                  #     f.write(f"| ❌ **Failed** | **{failed}** | **{fail_percentage:.2f}%** |\n")
-                      
-                  #     if skipped > 0:
-                  #         skip_percentage = (skipped / total * 100)
-                  #         f.write(f"| ⏭️ **Skipped** | **{skipped}** | **{skip_percentage:.2f}%** |\n")
-                      
-                  #     f.write(f"| 📊 **Total** | **{total}** | **100.00%** |\n\n")
-                      
-                  #     # # Badge
-                  #     # color = 'brightgreen' if pass_percentage >= 80 else 'yellow' if pass_percentage >= 60 else 'red'
-                  #     # f.write(f"![Tests](https://img.shields.io/badge/Tests-{passed}%20passed%2C%20{failed}%20failed-{color})\n")
-                  #     # f.write(f"![Pass Rate](https://img.shields.io/badge/Pass%20Rate-{pass_percentage:.1f}%25-{color})\n\n")
-                      
+                  
                   print("\n✅ Summary files created successfully!")
                   
                   # Set output variables for GitHub Actions
