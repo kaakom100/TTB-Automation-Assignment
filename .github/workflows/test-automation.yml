@@ -212,27 +212,27 @@ jobs:
                       # f.write(f"![Tests](https://img.shields.io/badge/Tests-{passed}%20passed%2C%20{failed}%20failed-{color})\n")
                       # f.write(f"![Pass Rate](https://img.shields.io/badge/Pass%20Rate-{pass_percentage:.1f}%25-{color})\n\n")
                       
-                      # Test Details
-                      if failed > 0:
-                          f.write("## ❌ Failed Tests\n\n")
-                          f.write("| Test Name | Error |\n")
-                          f.write("|-----------|-------|\n")
-                          for i in range(0, len(failed_tests), 2):
-                              if not failed_tests[i].startswith('  '):
-                                  error = failed_tests[i+1].replace('  └─ Error: ', '') if i+1 < len(failed_tests) else 'N/A'
-                                  f.write(f"| {failed_tests[i]} | {error[:50]}... |\n")
+                      # # Test Details
+                      # if failed > 0:
+                      #     f.write("## ❌ Failed Tests\n\n")
+                      #     f.write("| Test Name | Error |\n")
+                      #     f.write("|-----------|-------|\n")
+                      #     for i in range(0, len(failed_tests), 2):
+                      #         if not failed_tests[i].startswith('  '):
+                      #             error = failed_tests[i+1].replace('  └─ Error: ', '') if i+1 < len(failed_tests) else 'N/A'
+                      #             f.write(f"| {failed_tests[i]} | {error[:50]}... |\n")
                       
-                      # สร้าง Chart แบบ ASCII
-                      f.write("\n## 📈 Visual Summary\n\n")
-                      f.write("```\n")
-                      f.write("Pass Rate Chart:\n")
-                      f.write(f"[{'█' * int(pass_percentage/2)}{' ' * (50-int(pass_percentage/2))}] {pass_percentage:.1f}%\n")
-                      f.write("\nTest Distribution:\n")
-                      f.write(f"Passed : {'✅' * min(passed, 20)}\n")
-                      f.write(f"Failed : {'❌' * min(failed, 20)}\n")
-                      if skipped > 0:
-                          f.write(f"Skipped: {'⏭️' * min(skipped, 20)}\n")
-                      f.write("```\n")
+                      # # สร้าง Chart แบบ ASCII
+                      # f.write("\n## 📈 Visual Summary\n\n")
+                      # f.write("```\n")
+                      # f.write("Pass Rate Chart:\n")
+                      # f.write(f"[{'█' * int(pass_percentage/2)}{' ' * (50-int(pass_percentage/2))}] {pass_percentage:.1f}%\n")
+                      # f.write("\nTest Distribution:\n")
+                      # f.write(f"Passed : {'✅' * min(passed, 20)}\n")
+                      # f.write(f"Failed : {'❌' * min(failed, 20)}\n")
+                      # if skipped > 0:
+                      #     f.write(f"Skipped: {'⏭️' * min(skipped, 20)}\n")
+                      # f.write("```\n")
                   
                   print("\n✅ Summary files created successfully!")
                   
