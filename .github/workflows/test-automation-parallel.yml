@@ -7,8 +7,6 @@ name: 🤖 Automated Test Results
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -241,20 +239,18 @@ jobs:
               
               # Test Type Breakdown
               f.write("## 📈 Test Breakdown by Type\n\n")
-              f.write("| Test Type | Status | Passed | Failed | Total | Pass Rate |\n")
-              f.write("|-----------|--------|--------|--------|-------|----------|\n")
+              f.write("| Test Type | Passed | Failed | Total | Pass Rate |\n")
+              f.write("|-----------|--------|--------|-------|----------|\n")
               
               # Web Tests Row
               if web_results:
-                  web_status = "✅" if web_results['pass_rate'] == 100 else "⚠️" if web_results['pass_rate'] >= 50 else "❌"
-                  f.write(f"| **Web Tests** | {web_status} | {web_results['passed']} | {web_results['failed']} | {web_results['total']} | **{web_results['pass_rate']}%** |\n")
+                  f.write(f"| **Web Tests** | {web_results['passed']} | {web_results['failed']} | {web_results['total']} | **{web_results['pass_rate']}%** |\n")
               else:
                   f.write("| **Web Tests** | ⏭️ | - | - | - | **N/A** |\n")
               
               # API Tests Row
               if api_results:
-                  api_status = "✅" if api_results['pass_rate'] == 100 else "⚠️" if api_results['pass_rate'] >= 50 else "❌"
-                  f.write(f"| **API Tests** | {api_status} | {api_results['passed']} | {api_results['failed']} | {api_results['total']} | **{api_results['pass_rate']}%** |\n")
+                  f.write(f"| **API Tests** | {api_results['passed']} | {api_results['failed']} | {api_results['total']} | **{api_results['pass_rate']}%** |\n")
               else:
                   f.write("| **API Tests** | ⏭️ | - | - | - | **N/A** |\n")
               
