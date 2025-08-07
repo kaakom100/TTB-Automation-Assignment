@@ -187,53 +187,55 @@ jobs:
                       json.dump(badge_data, f, indent=2)
                   
                   # สร้าง Markdown สำหรับ GitHub Summary
-                  with open('test_summary.md', 'w') as f:
-                      f.write(f"# {status_emoji} Web Test Results\n\n")
-                      
-                      # ตารางสรุป
-                      f.write("## 📊 Summary\n\n")
-                      f.write("| Status | Count | Test Names | Percentage |\n")
-                      f.write("|--------|-------|-----------------------------|------------|\n")
-                      
-                      # Progress bar สำหรับ Pass
-                      f.write(f"| ✅ **Passed** | **{passed}** | **{pass_percentage:.2f}%** |\n")
-                      
-                      # Progress bar สำหรับ Fail
-                      f.write(f"| ❌ **Failed** | **{failed}** | **{fail_percentage:.2f}%** |\n")
-                      
-                      if skipped > 0:
-                          skip_percentage = (skipped / total * 100)
-                          f.write(f"| ⏭️ **Skipped** | **{skipped}** | **{skip_percentage:.2f}%** |\n")
-                      
-                      f.write(f"| 📊 **Total** | **{total}** | **100.00%** |\n\n")
-                      
-                      # # Badge
-                      # color = 'brightgreen' if pass_percentage >= 80 else 'yellow' if pass_percentage >= 60 else 'red'
-                      # f.write(f"![Tests](https://img.shields.io/badge/Tests-{passed}%20passed%2C%20{failed}%20failed-{color})\n")
-                      # f.write(f"![Pass Rate](https://img.shields.io/badge/Pass%20Rate-{pass_percentage:.1f}%25-{color})\n\n")
-                      
-                      # # Test Details
-                      # if failed > 0:
-                      #     f.write("## ❌ Failed Tests\n\n")
-                      #     f.write("| Test Name | Error |\n")
-                      #     f.write("|-----------|-------|\n")
-                      #     for i in range(0, len(failed_tests), 2):
-                      #         if not failed_tests[i].startswith('  '):
-                      #             error = failed_tests[i+1].replace('  └─ Error: ', '') if i+1 < len(failed_tests) else 'N/A'
-                      #             f.write(f"| {failed_tests[i]} | {error[:50]}... |\n")
-                      
-                      # # สร้าง Chart แบบ ASCII
-                      # f.write("\n## 📈 Visual Summary\n\n")
-                      # f.write("```\n")
-                      # f.write("Pass Rate Chart:\n")
-                      # f.write(f"[{'█' * int(pass_percentage/2)}{' ' * (50-int(pass_percentage/2))}] {pass_percentage:.1f}%\n")
-                      # f.write("\nTest Distribution:\n")
-                      # f.write(f"Passed : {'✅' * min(passed, 20)}\n")
-                      # f.write(f"Failed : {'❌' * min(failed, 20)}\n")
-                      # if skipped > 0:
-                      #     f.write(f"Skipped: {'⏭️' * min(skipped, 20)}\n")
-                      # f.write("```\n")
+                  with open('test_summary.md', 'w', encoding='utf-8') as f:
+                  f.write(f"# {status_emoji} Web Test Results\n\n")
+                  f.write("## 📊 Summary\n\n")
+                  f.write("| Status | Count | Test Names | Percentage |\n")
+                  f.write("|--------|-------|------------|------------|\n")
                   
+                  # Test ที่ผ่าน
+                  passed_list = "<br>".join(passed_tests) if passed_tests else "-"
+                  f.write(f"| ✅ **Passed** | **{passed}** | {passed_list} | **{pass_percentage:.2f}%** |\n")
+                  
+                  # Test ที่ไม่ผ่าน (แค่ชื่อ ถ้าต้องการ error เพิ่มเติมก็บอกได้)
+                  failed_list = ""
+                  if failed > 0:
+                      # เอาแต่ชื่อ (ไม่เอาข้อความ Error) กรณี failed_tests มีชื่อ+error สลับกัน
+                      failed_names = [failed_tests[i] for i in range(0, len(failed_tests), 2)]
+                      failed_list = "<br>".join(failed_names)
+                      f.write(f"| ❌ **Failed** | **{failed}** | {failed_list} | **{fail_percentage:.2f}%** |\n")
+                  
+                  # ถ้ามี Skipped (ไม่บ่อย)
+                  if skipped > 0:
+                      skip_percentage = (skipped / total * 100)
+                      f.write(f"| ⏭️ **Skipped** | **{skipped}** | - | **{skip_percentage:.2f}%** |\n")
+                  
+                  f.write(f"| 📊 **Total** | **{total}** | - | **100.00%** |\n\n")
+                  # with open('test_summary.md', 'w') as f:
+                  #     f.write(f"# {status_emoji} Web Test Results\n\n")
+                      
+                  #     # ตารางสรุป
+                  #     f.write("## 📊 Summary\n\n")
+                  #     f.write("| Status | Count | Test Names | Percentage |\n")
+                  #     f.write("|--------|-------|-----------------------------|------------|\n")
+                      
+                  #     # Progress bar สำหรับ Pass
+                  #     f.write(f"| ✅ **Passed** | **{passed}** | **{pass_percentage:.2f}%** |\n")
+                      
+                  #     # Progress bar สำหรับ Fail
+                  #     f.write(f"| ❌ **Failed** | **{failed}** | **{fail_percentage:.2f}%** |\n")
+                      
+                  #     if skipped > 0:
+                  #         skip_percentage = (skipped / total * 100)
+                  #         f.write(f"| ⏭️ **Skipped** | **{skipped}** | **{skip_percentage:.2f}%** |\n")
+                      
+                  #     f.write(f"| 📊 **Total** | **{total}** | **100.00%** |\n\n")
+                      
+                  #     # # Badge
+                  #     # color = 'brightgreen' if pass_percentage >= 80 else 'yellow' if pass_percentage >= 60 else 'red'
+                  #     # f.write(f"![Tests](https://img.shields.io/badge/Tests-{passed}%20passed%2C%20{failed}%20failed-{color})\n")
+                  #     # f.write(f"![Pass Rate](https://img.shields.io/badge/Pass%20Rate-{pass_percentage:.1f}%25-{color})\n\n")
+                      
                   print("\n✅ Summary files created successfully!")
                   
                   # Set output variables for GitHub Actions
