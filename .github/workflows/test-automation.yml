@@ -215,8 +215,8 @@ jobs:
                   #     "status": status_text
                   # }
                   
-                  # with open('results/test_summary.json', 'w') as f:
-                  #     json.dump(badge_data, f, indent=2)
+                  with open('results/test_summary.json', 'w') as f:
+                      json.dump(badge_data, f, indent=2)
                   
                   # สร้าง Markdown สำหรับ GitHub Summary
                   with open('test_summary.md', 'w', encoding='utf-8') as f:
