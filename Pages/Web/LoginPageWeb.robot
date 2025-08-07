@@ -38,7 +38,7 @@ Open Web Browser
     [Setup]    _Set Test Local Variables
     [Arguments]    ${url}    ${browser}    
     ${browser_lower}    String.Convert To Lower Case    ${browser}
-    SeleniumLibrary.Open Browser    url=${url}    browser=${browser_lower}    options=add_argument(--disable-dev-shm-usage);add_argument(--no-sandbox)
+    SeleniumLibrary.Open Browser    url=${url}    browser=${browser_lower}    options=add_argument("--disable-dev-shm-usage")
     SeleniumLibrary.Maximize Browser Window
 
 Input Username
