@@ -1,278 +1,377 @@
 # ===============================================
-# ไฟล์นี้คือตัวที่จะรันเทสให้เราอัตโนมัติ
+# Parallel Test Automation Pipeline
 # ===============================================
 
-# ชื่อที่จะแสดงใน GitHub เมื่อกดปุ่ม Run บน GitHub
 name: 🤖 Automated Test Results
 
-# กำหนดว่าจะรันเมื่อไหร่
 on:
-  # รันเมื่อ push code ไปที่ branch main
   push:
     branches: [ main ]
-  # รันเมื่อกดปุ่มรันเองใน GitHub
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
-# งานที่จะทำ
 jobs:
+  # ============================================
+  # JOB 1: Web Testing
+  # ============================================
   test-web:
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
+      
       - name: 📥 Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12.4'
-      - name: 📥 Install Robot Framework
+      
+      - name: 📥 Install dependencies
         run: |
           pip install -r requirements.txt
-      - name: 🧪 Run Web Tests Only
+      
+      - name: 🧪 Run Web Tests
         run: |
-          mkdir -p results
+          mkdir -p results/web
           robot \
             --variable BROWSER:headlesschrome \
-            --outputdir results \
+            --outputdir results/web \
             --output output.xml \
             --log log.html \
             --report report.html \
             --name "Web Tests" \
             TestScript/Web/Staging/FlowLogin.robot || true
-      - name: Upload Web Test Results
+      
+      - name: 📊 Generate Web Summary
+        if: always()
+        run: |
+          cat > analyze_web.py << 'EOF'
+          import xml.etree.ElementTree as ET
+          import json
+          
+          tree = ET.parse('results/web/output.xml')
+          root = tree.getroot()
+          stats = root.find('.//statistics/total/stat')
+          
+          passed = int(stats.get('pass', 0))
+          failed = int(stats.get('fail', 0))
+          total = passed + failed
+          
+          summary = {
+              "type": "web",
+              "passed": passed,
+              "failed": failed,
+              "total": total,
+              "pass_rate": round((passed/total*100), 2) if total > 0 else 0
+          }
+          
+          with open('results/web/summary.json', 'w') as f:
+              json.dump(summary, f, indent=2)
+          
+          print(f"✅ Web Tests: {passed}/{total} passed ({summary['pass_rate']}%)")
+          EOF
+          
+          python analyze_web.py
+      
+      - name: 📤 Upload Web Results
         uses: actions/upload-artifact@v4
         with:
           name: web-results
-          path: results/
+          path: results/web/
 
+  # ============================================
+  # JOB 2: API Testing
+  # ============================================
   test-api:
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
+      
       - name: 📥 Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12.4'
-      - name: 📥 Install Robot Framework
+      
+      - name: 📥 Install dependencies
         run: |
           pip install -r requirements.txt
-      - name: 🧪 Run API Tests Only
+      
+      - name: 🧪 Run API Tests
         run: |
-          mkdir -p results
+          mkdir -p results/api
           robot \
-            --outputdir results \
+            --outputdir results/api \
             --output output.xml \
             --log log.html \
             --report report.html \
             --name "API Tests" \
             TestScript/API/API.robot || true
-      - name: Upload API Test Results        # <<== ต้องเป็น upload!
+      
+      - name: 📊 Generate API Summary
+        if: always()
+        run: |
+          cat > analyze_api.py << 'EOF'
+          import xml.etree.ElementTree as ET
+          import json
+          
+          tree = ET.parse('results/api/output.xml')
+          root = tree.getroot()
+          stats = root.find('.//statistics/total/stat')
+          
+          passed = int(stats.get('pass', 0))
+          failed = int(stats.get('fail', 0))
+          total = passed + failed
+          
+          summary = {
+              "type": "api",
+              "passed": passed,
+              "failed": failed,
+              "total": total,
+              "pass_rate": round((passed/total*100), 2) if total > 0 else 0
+          }
+          
+          with open('results/api/summary.json', 'w') as f:
+              json.dump(summary, f, indent=2)
+          
+          print(f"✅ API Tests: {passed}/{total} passed ({summary['pass_rate']}%)")
+          EOF
+          
+          python analyze_api.py
+      
+      - name: 📤 Upload API Results
         uses: actions/upload-artifact@v4
         with:
           name: api-results
-          path: results/
+          path: results/api/
 
+  # ============================================
+  # JOB 3: Combined Summary Report
+  # ============================================
   summary:
-    needs: [test-api, test-web]
+    needs: [test-web, test-api]
     runs-on: ubuntu-latest
+    if: always()
     steps:
-      - name: Download Web Test Results
+      - name: 📥 Download Web Results
         uses: actions/download-artifact@v4
         with:
           name: web-results
           path: web-results/
-      - name: Download API Test Results
+      
+      - name: 📥 Download API Results
         uses: actions/download-artifact@v4
         with:
           name: api-results
           path: api-results/
-
-      # ============================================
-      # STEP 3: Generate Test Report
-      # ============================================
-      - name: 📊 Generate Test Summary Report
-        if: always()
+      
+      - name: 📊 Generate Combined Report
         run: |
-          # สร้าง Python script สำหรับวิเคราะห์ผล
-          cat > analyze_results.py << 'PYTHON_SCRIPT'
+          cat > generate_report.py << 'EOF'
+          import json
           import xml.etree.ElementTree as ET
           import os
-          import json
+          from datetime import datetime
           
-          def analyze_robot_results():
-              xml_file = 'results/output.xml'
+          def parse_xml(xml_path, test_type):
+              """Parse Robot Framework XML and extract test details"""
+              if not os.path.exists(xml_path):
+                  return None
+                  
+              tree = ET.parse(xml_path)
+              root = tree.getroot()
               
-              if not os.path.exists(xml_file):
-                  print("❌ ไม่พบไฟล์ผลการทดสอบ")
-                  return
+              stats = root.find('.//statistics/total/stat')
+              passed = int(stats.get('pass', 0))
+              failed = int(stats.get('fail', 0))
+              total = passed + failed
               
-              try:
-                  tree = ET.parse(xml_file)
-                  root = tree.getroot()
-                  
-                  # ดึงสถิติหลัก
-                  stats = root.find('.//statistics/total/stat')
-                  if stats is None:
-                      print("❌ ไม่พบข้อมูลสถิติในไฟล์")
-                      return
-                  
-                  # นับจำนวน Pass/Fail/Skip
-                  passed = int(stats.get('pass', 0))
-                  failed = int(stats.get('fail', 0))
-                  skipped = int(stats.get('skip', 0))
-                  total = passed + failed + skipped
-                  
-                  # คำนวณเปอร์เซ็นต์
-                  pass_percentage = (passed / total * 100) if total > 0 else 0
-                  fail_percentage = (failed / total * 100) if total > 0 else 0
-                  
-                  # แสดงผลใน Console
-                  print("\n" + "="*60)
-                  print("📊 WEB TEST EXECUTION SUMMARY")
-                  print("="*60)
-                  print(f"✅ PASSED:  {passed:3d} tests ({pass_percentage:6.2f}%)")
-                  print(f"❌ FAILED:  {failed:3d} tests ({fail_percentage:6.2f}%)")
-                  if skipped > 0:
-                      skip_percentage = (skipped / total * 100)
-                      print(f"⏭️  SKIPPED: {skipped:3d} tests ({skip_percentage:6.2f}%)")
-                  print("-"*60)
-                  print(f"📊 TOTAL:   {total:3d} tests (100.00%)")
-                  print(f"📈 PASS RATE: {pass_percentage:.2f}%")
-                  print("="*60)
-
-                  # เก็บรายชื่อ Test
-                  passed_details = []
-                  failed_details = []
-                  passed_tests = []  # เอาไว้ใช้โชว์ row passed เฉยๆ
-
-                  for suite in root.findall('.//suite'):
-                      for test in suite.findall('.//test'):
-                          name = test.get('name', 'Unknown')
-                          status = test.find('./status').get('status')
-                          if status == 'PASS':
-                              passed_details.append({'name': name, 'error': ''})
-                              passed_tests.append(name)
-                          elif status == 'FAIL':
-                              msg_node = test.find('./status')
-                              error = msg_node.text.strip() if msg_node is not None and msg_node.text else "No error message"
-                              failed_details.append({'name': name, 'error': error})
-
-                  # Debug print
-                  print('passed_tests =', passed_tests)
-                  print('failed_details =', failed_details)
-                  
-                  # สร้างไฟล์ JSON
-                  badge_data = {
-                      "passed": passed,
-                      "failed": failed,
-                      "skipped": skipped,
-                      "total": total,
-                      "pass_rate": round(pass_percentage, 2),
-                      "status": "Perfect" if pass_percentage == 100 else "Good" if pass_percentage >= 80 else "Warning"
-                  }
-
-                  os.makedirs('results', exist_ok=True)
-                  with open('results/test_summary.json', 'w') as f:
-                      json.dump(badge_data, f, indent=2)
-                  
-                  # สร้าง Markdown สำหรับ GitHub Summary
-                  with open('test_summary.md', 'w', encoding='utf-8') as f:
-                      # Header
-                      if pass_percentage == 100:
-                          f.write("# ✅ All Tests Passed!\n\n")
-                          status_emoji = "✅"
-                      elif pass_percentage == 0:
-                          f.write("# ❌ All Tests Failed!\n\n")
-                          status_emoji = "❌"
-                      else:
-                          f.write("# ⚠️ Test Summary\n\n")
-                          status_emoji = "⚠️"
+              # Extract test details
+              tests = []
+              for suite in root.findall('.//suite'):
+                  for test in suite.findall('.//test'):
+                      name = test.get('name', 'Unknown')
+                      status = test.find('./status').get('status')
                       
-                      f.write("## 📊 Summary\n\n")
-                      f.write("| Status | Count | Test Case Name | Percentage |\n")
-                      f.write("|--------|-------|------------|------------|\n")
+                      # Get error message if failed
+                      error_msg = ""
+                      if status == 'FAIL':
+                          msg_node = test.find('./status')
+                          if msg_node is not None and msg_node.text:
+                              error_msg = msg_node.text.strip()[:100]  # Limit error message length
                       
-                      # Passed (แสดงรายชื่อ Passed Tests)
-                      if passed > 0:
-                          # รวมชื่อ test ทั้งหมดในบรรทัดเดียว ใช้ <br> คั่น
-                          passed_list = "<br>".join(passed_tests) if passed_tests else "-"
-                          f.write(f"| ✅ **Passed** | **{passed}** | {passed_list} | **{pass_percentage:.2f}%** |\n")
-                      else:
-                          f.write(f"| ✅ **Passed** | **0** | - | **0.00%** |\n")
-                      
-                      # Fail (แสดงรายชื่อ Failed Tests พร้อม error)
-                      if failed > 0:
-                          failed_info = []
-                          for detail in failed_details:
-                              failed_info.append(f"{detail['name']}<br><small>({detail['error']})</small>")
-                          failed_names = "<br><br>".join(failed_info)
-                          f.write(f"| ❌ **Failed** | **{failed}** | {failed_names} | **{fail_percentage:.2f}%** |\n")
-                      else:
-                          f.write(f"| ❌ **Failed** | **0** | - | **0.00%** |\n")
-
-                      # Total (แยก Passed/Failed พร้อมไอคอน)
-                      all_names_md = ""
-                      if passed_details:
-                          all_names_md += "<b>✅ Passed</b><br>"
-                          for t in passed_details:
-                              all_names_md += f"- {t['name']}<br>"
-                          all_names_md += "<br>"
-                      if failed_details:
-                          all_names_md += "<b>❌ Failed</b><br>"
-                          for t in failed_details:
-                              all_names_md += f"- {t['name']}<br>"
-                      # ลบ <br> ท้ายสุดถ้ามี
-                      if all_names_md.endswith("<br>"):
-                          all_names_md = all_names_md[:-4]
-                      if not all_names_md.strip():
-                          all_names_md = "-"
-                      f.write(f"| 📊 **Total** | **{total}** | {all_names_md} | **100.00%** |\n\n")
-                      
-                  print("\n✅ Summary files created successfully!")
-                  
-              except Exception as e:
-                  print(f"❌ Error analyzing results: {str(e)}")
-                  import traceback
-                  traceback.print_exc()
+                      tests.append({
+                          'name': name,
+                          'status': status,
+                          'error': error_msg,
+                          'type': test_type
+                      })
+              
+              return {
+                  'passed': passed,
+                  'failed': failed,
+                  'total': total,
+                  'pass_rate': round((passed/total*100), 2) if total > 0 else 0,
+                  'tests': tests
+              }
           
-          if __name__ == "__main__":
-              analyze_robot_results()
-          PYTHON_SCRIPT
+          # Parse both test results
+          web_results = parse_xml('web-results/output.xml', 'Web')
+          api_results = parse_xml('api-results/output.xml', 'API')
           
-          # รัน script วิเคราะห์ผล
-          python analyze_results.py
+          # Calculate combined statistics
+          total_passed = (web_results['passed'] if web_results else 0) + (api_results['passed'] if api_results else 0)
+          total_failed = (web_results['failed'] if web_results else 0) + (api_results['failed'] if api_results else 0)
+          total_tests = total_passed + total_failed
+          overall_pass_rate = round((total_passed/total_tests*100), 2) if total_tests > 0 else 0
+          
+          # Generate Markdown report
+          with open('test_summary.md', 'w', encoding='utf-8') as f:
+              # Header with overall status
+              if overall_pass_rate == 100:
+                  f.write("# ✅ All Tests Passed!\n\n")
+              elif overall_pass_rate >= 80:
+                  f.write("# 🎯 Tests Mostly Passed\n\n")
+              elif overall_pass_rate >= 50:
+                  f.write("# ⚠️ Some Tests Failed\n\n")
+              else:
+                  f.write("# ❌ Many Tests Failed\n\n")
+              
+              # Overall Summary
+              f.write("## 📊 Overall Summary\n\n")
+              f.write(f"**Total Pass Rate:** {overall_pass_rate}% ({total_passed}/{total_tests})\n\n")
+              
+              # Test Type Breakdown
+              f.write("## 📈 Test Breakdown by Type\n\n")
+              f.write("| Test Type | Status | Passed | Failed | Total | Pass Rate |\n")
+              f.write("|-----------|--------|--------|--------|-------|----------|\n")
+              
+              # Web Tests Row
+              if web_results:
+                  web_status = "✅" if web_results['pass_rate'] == 100 else "⚠️" if web_results['pass_rate'] >= 50 else "❌"
+                  f.write(f"| **Web Tests** | {web_status} | {web_results['passed']} | {web_results['failed']} | {web_results['total']} | **{web_results['pass_rate']}%** |\n")
+              else:
+                  f.write("| **Web Tests** | ⏭️ | - | - | - | **N/A** |\n")
+              
+              # API Tests Row
+              if api_results:
+                  api_status = "✅" if api_results['pass_rate'] == 100 else "⚠️" if api_results['pass_rate'] >= 50 else "❌"
+                  f.write(f"| **API Tests** | {api_status} | {api_results['passed']} | {api_results['failed']} | {api_results['total']} | **{api_results['pass_rate']}%** |\n")
+              else:
+                  f.write("| **API Tests** | ⏭️ | - | - | - | **N/A** |\n")
+              
+              # Total Row
+              f.write(f"| **TOTAL** | {'✅' if overall_pass_rate == 100 else '⚠️' if overall_pass_rate >= 50 else '❌'} | **{total_passed}** | **{total_failed}** | **{total_tests}** | **{overall_pass_rate}%** |\n\n")
+              
+              # Failed Tests Details (if any)
+              all_failed_tests = []
+              if web_results:
+                  all_failed_tests.extend([t for t in web_results['tests'] if t['status'] == 'FAIL'])
+              if api_results:
+                  all_failed_tests.extend([t for t in api_results['tests'] if t['status'] == 'FAIL'])
+              
+              if all_failed_tests:
+                  f.write("## ❌ Failed Tests Details\n\n")
+                  f.write("| Type | Test Name | Error Message |\n")
+                  f.write("|------|-----------|---------------|\n")
+                  for test in all_failed_tests:
+                      error = test['error'][:50] + "..." if len(test['error']) > 50 else test['error']
+                      f.write(f"| {test['type']} | {test['name']} | {error} |\n")
+                  f.write("\n")
+              
+              # Passed Tests Summary
+              all_passed_tests = []
+              if web_results:
+                  all_passed_tests.extend([t for t in web_results['tests'] if t['status'] == 'PASS'])
+              if api_results:
+                  all_passed_tests.extend([t for t in api_results['tests'] if t['status'] == 'PASS'])
+              
+              if all_passed_tests:
+                  f.write("## ✅ Passed Tests\n\n")
+                  f.write("<details>\n")
+                  f.write("<summary>Click to expand passed tests list</summary>\n\n")
+                  f.write("| Type | Test Name |\n")
+                  f.write("|------|-----------|\n")
+                  for test in all_passed_tests:
+                      f.write(f"| {test['type']} | {test['name']} |\n")
+                  f.write("\n</details>\n\n")
+              
+              # Execution Details
+              f.write("## 📝 Execution Details\n\n")
+              f.write(f"- **Execution Time:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}\n")
+              f.write(f"- **Branch:** ${{ github.ref_name }}\n")
+              f.write(f"- **Commit:** ${{ github.sha }}\n")
+              f.write(f"- **Triggered by:** @${{ github.actor }}\n")
+              f.write(f"- **Workflow:** ${{ github.workflow }}\n")
+              
+          print("\n" + "="*60)
+          print("📊 COMBINED TEST RESULTS")
+          print("="*60)
+          print(f"Web Tests:  {web_results['passed'] if web_results else 0}/{web_results['total'] if web_results else 0} passed")
+          print(f"API Tests:  {api_results['passed'] if api_results else 0}/{api_results['total'] if api_results else 0} passed")
+          print("-"*60)
+          print(f"TOTAL:      {total_passed}/{total_tests} passed ({overall_pass_rate}%)")
+          print("="*60)
+          EOF
+          
+          python generate_report.py
       
       - name: 📝 Update GitHub Job Summary
         if: always()
         run: |
-          # เพิ่ม Summary ใน GitHub
           if [ -f "test_summary.md" ]; then
             cat test_summary.md >> $GITHUB_STEP_SUMMARY
-            
-            # เพิ่มข้อมูลเพิ่มเติม
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "---" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "### 📌 Test Information" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **Runner:** ${{ runner.os }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **Workflow:** ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ No test summary available" >> $GITHUB_STEP_SUMMARY
           fi
       
-      - name: Set current date and time
-        id: set-datetime
+      - name: 🗓️ Set current date and time
+        id: datetime
         run: echo "datetime=$(TZ='Asia/Bangkok' date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_OUTPUT
-
-      - name: 📁 Upload Test Results Artifact
+      
+      - name: 📦 Create Combined Artifact
+        if: always()
+        run: |
+          mkdir -p combined-results
+          cp -r web-results/* combined-results/web/ 2>/dev/null || true
+          cp -r api-results/* combined-results/api/ 2>/dev/null || true
+          cp test_summary.md combined-results/ 2>/dev/null || true
+      
+      - name: 📤 Upload Combined Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Robot-Test-Results-${{ steps.set-datetime.outputs.datetime }}
-          path: results/
+          name: Test-Results-${{ steps.datetime.outputs.datetime }}
+          path: combined-results/
           retention-days: 30
-                
+      
+      - name: 🚨 Check Test Status
+        if: always()
+        run: |
+          # Parse results and fail if tests failed
+          python << 'EOF'
+          import json
+          import sys
+          import os
+          
+          failed_count = 0
+          
+          # Check web results
+          if os.path.exists('web-results/summary.json'):
+              with open('web-results/summary.json') as f:
+                  web = json.load(f)
+                  failed_count += web.get('failed', 0)
+          
+          # Check API results  
+          if os.path.exists('api-results/summary.json'):
+              with open('api-results/summary.json') as f:
+                  api = json.load(f)
+                  failed_count += api.get('failed', 0)
+          
+          if failed_count > 0:
+              print(f"❌ {failed_count} tests failed!")
+              sys.exit(1)
+          else:
+              print("✅ All tests passed!")
+              sys.exit(0)
+          EOF
