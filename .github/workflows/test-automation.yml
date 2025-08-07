@@ -161,7 +161,7 @@ jobs:
                           status_emoji = "⚠️"
                       
                       f.write("## 📊 Summary\n\n")
-                      f.write("| Status | Count | Test Names | Percentage |\n")
+                      f.write("| Status | Count | Test Case Name | Percentage |\n")
                       f.write("|--------|-------|------------|------------|\n")
                       
                       # แสดงรายชื่อ Passed Tests
@@ -176,7 +176,7 @@ jobs:
                       if failed > 0:
                           failed_info = []
                           for detail in failed_details:
-                              failed_info.append(f"❌ {detail['name']}<br><small>({detail['error']})</small>")
+                              failed_info.append(f"{detail['name']}<br><small>({detail['error']})</small>")
                           failed_names = "<br><br>".join(failed_info)
                           f.write(f"| ❌ **Failed** | **{failed}** | {failed_names} | **{fail_percentage:.2f}%** |\n")
                       else:
