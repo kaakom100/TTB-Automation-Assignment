@@ -114,32 +114,12 @@ jobs:
                   print(f"📊 TOTAL:   {total:3d} tests (100.00%)")
                   print(f"📈 PASS RATE: {pass_percentage:.2f}%")
                   print("="*60)
-                  
-                  # สถานะโดยรวม
-                  if pass_percentage == 100:
-                      print("\n🎉 EXCELLENT! All tests passed!")
-                      status_emoji = "🎉"
-                      status_text = "Perfect"
-                  elif pass_percentage >= 80:
-                      print("\n✅ GOOD! Most tests passed")
-                      status_emoji = "✅"
-                      status_text = "Good"
-                  elif pass_percentage >= 60:
-                      print("\n⚠️  WARNING! Several tests failed")
-                      status_emoji = "⚠️"
-                      status_text = "Warning"
-                  else:
-                      print("\n❌ CRITICAL! Many tests failed")
-                      status_emoji = "❌"
-                      status_text = "Critical"
-                  
-                  # รายการ Test ที่ผ่าน
-                  print("\n" + "="*60)
-                  print("📋 TEST DETAILS")
-                  print("="*60)
 
+                  # เก็บรายชื่อ Test
                   passed_tests = []
                   failed_tests = []
+                  failed_details = []
+                  
                   for test in root.iter('test'):
                       test_name = test.get('name', 'Unknown')
                       test_status = test.get('status', 'UNKNOWN')
@@ -149,68 +129,240 @@ jobs:
                           failed_tests.append(test_name)
                           msg = test.find('.//msg[@level="FAIL"]')
                           error_msg = msg.text if msg is not None and msg.text else "No error message"
-                          failed_tests.append(f"  └─ Error: {error_msg[:100]}")
+                          error_msg = error_msg.split('\n')[0][:80]
+                          failed_details.append({'name': test_name, 'error': error_msg})
 
-                  print("Passed tests =", passed_tests)
-                  print("Failed tests =", failed_tests)
+                  print(f"Passed tests = {passed_tests}")
+                  print(f"Failed tests = {failed_tests}")
                   
-                  # --- ประกาศ badge_data ที่นี่ ---
+                  # สร้างไฟล์ JSON
                   badge_data = {
                       "passed": passed,
                       "failed": failed,
                       "skipped": skipped,
                       "total": total,
                       "pass_rate": round(pass_percentage, 2),
-                      "status": "Perfect"  # หรือจะใช้ status_text ตามเดิม
+                      "status": "Perfect" if pass_percentage == 100 else "Good" if pass_percentage >= 80 else "Warning"
                   }
 
+                  os.makedirs('results', exist_ok=True)
                   with open('results/test_summary.json', 'w') as f:
                       json.dump(badge_data, f, indent=2)
                   
                   # สร้าง Markdown สำหรับ GitHub Summary
                   with open('test_summary.md', 'w', encoding='utf-8') as f:
-                      f.write(f"# {status_emoji} Web Test Results\n\n")
+                      # Header
+                      if pass_percentage == 100:
+                          f.write("# ✅ All Tests Passed!\n\n")
+                          status_emoji = "✅"
+                      elif pass_percentage >= 80:
+                          f.write("# ✅ Web Test Results\n\n")
+                          status_emoji = "✅"
+                      elif pass_percentage >= 60:
+                          f.write("# ⚠️ Web Test Results\n\n")
+                          status_emoji = "⚠️"
+                      else:
+                          f.write("# ❌ Web Test Results\n\n")
+                          status_emoji = "❌"
+                      
                       f.write("## 📊 Summary\n\n")
                       f.write("| Status | Count | Test Names | Percentage |\n")
                       f.write("|--------|-------|------------|------------|\n")
                       
-                      # รายชื่อ test ที่ผ่าน
-                      passed_list = "<br>".join(passed_tests) if passed_tests else "-"
-                      f.write(f"| ✅ **Passed** | **{passed}** | {passed_list} | **{pass_percentage:.2f}%** |\n")
+                      # แสดงรายชื่อ Passed Tests
+                      if passed > 0:
+                          # รวมชื่อ test ทั้งหมดในบรรทัดเดียว ใช้ <br> คั่น
+                          passed_names = "<br>".join([f"✅ {name}" for name in passed_tests])
+                          f.write(f"| ✅ **Passed** | **{passed}** | {passed_names} | **{pass_percentage:.2f}%** |\n")
+                      else:
+                          f.write(f"| ✅ **Passed** | **0** | - | **0.00%** |\n")
                       
-                      # รายชื่อ test ที่ไม่ผ่าน + error
+                      # แสดงรายชื่อ Failed Tests พร้อม error
                       if failed > 0:
-                          failed_pairs = []
-                          for i in range(0, len(failed_tests), 2):
-                              name = failed_tests[i]
-                              if i + 1 < len(failed_tests):
-                                  error = failed_tests[i + 1][10:]  # ตัด '  └─ Error: ' ข้างหน้า
-                              else:
-                                  error = ""
-                              failed_pairs.append(f"{name} <br><span style='color:#b33'>• {error}</span>")
-                          failed_list = "<br><br>".join(failed_pairs)
-                          f.write(f"| ❌ **Failed** | **{failed}** | {failed_list} | **{fail_percentage:.2f}%** |\n")
-
-                      # รวมทั้งหมด
+                          failed_info = []
+                          for detail in failed_details:
+                              failed_info.append(f"❌ {detail['name']}<br><small>({detail['error']})</small>")
+                          failed_names = "<br><br>".join(failed_info)
+                          f.write(f"| ❌ **Failed** | **{failed}** | {failed_names} | **{fail_percentage:.2f}%** |\n")
+                      else:
+                          f.write(f"| ❌ **Failed** | **0** | - | **0.00%** |\n")
+                      
+                      # แสดง Total
                       f.write(f"| 📊 **Total** | **{total}** | - | **100.00%** |\n\n")
+                      
+                      # หรือถ้าอยากแสดงแบบแยก section
+                      if passed_tests:
+                          f.write("### ✅ Passed Tests:\n")
+                          for test in passed_tests:
+                              f.write(f"- {test}\n")
+                          f.write("\n")
+                      
+                      if failed_tests:
+                          f.write("### ❌ Failed Tests:\n")
+                          for detail in failed_details:
+                              f.write(f"- **{detail['name']}**\n")
+                              f.write(f"  - Error: `{detail['error']}`\n")
+                          f.write("\n")
                   
                   print("\n✅ Summary files created successfully!")
                   
-                  # Set output variables for GitHub Actions
-                  print(f"::set-output name=total::{total}")
-                  print(f"::set-output name=passed::{passed}")
-                  print(f"::set-output name=failed::{failed}")
-                  print(f"::set-output name=pass_rate::{pass_percentage:.2f}")
-                  
               except Exception as e:
                   print(f"❌ Error analyzing results: {str(e)}")
+                  import traceback
+                  traceback.print_exc()
           
           if __name__ == "__main__":
               analyze_robot_results()
           PYTHON_SCRIPT
           
-          # # รัน script วิเคราะห์ผล
+          # รัน script วิเคราะห์ผล
           python analyze_results.py
+      # - name: 📊 Generate Test Summary Report
+      #   if: always()
+      #   run: |
+      #     # สร้าง Python script สำหรับวิเคราะห์ผล
+      #     cat > analyze_results.py << 'PYTHON_SCRIPT'
+      #     import xml.etree.ElementTree as ET
+      #     import os
+      #     import json
+          
+      #     def analyze_robot_results():
+      #         xml_file = 'results/output.xml'
+              
+      #         if not os.path.exists(xml_file):
+      #             print("❌ ไม่พบไฟล์ผลการทดสอบ")
+      #             return
+              
+      #         try:
+      #             tree = ET.parse(xml_file)
+      #             root = tree.getroot()
+                  
+      #             # ดึงสถิติหลัก
+      #             stats = root.find('.//statistics/total/stat')
+      #             if stats is None:
+      #                 print("❌ ไม่พบข้อมูลสถิติในไฟล์")
+      #                 return
+                  
+      #             # นับจำนวน Pass/Fail/Skip
+      #             passed = int(stats.get('pass', 0))
+      #             failed = int(stats.get('fail', 0))
+      #             skipped = int(stats.get('skip', 0))
+      #             total = passed + failed + skipped
+                  
+      #             # คำนวณเปอร์เซ็นต์
+      #             pass_percentage = (passed / total * 100) if total > 0 else 0
+      #             fail_percentage = (failed / total * 100) if total > 0 else 0
+                  
+      #             # แสดงผลใน Console
+      #             print("\n" + "="*60)
+      #             print("📊 WEB TEST EXECUTION SUMMARY")
+      #             print("="*60)
+      #             print(f"✅ PASSED:  {passed:3d} tests ({pass_percentage:6.2f}%)")
+      #             print(f"❌ FAILED:  {failed:3d} tests ({fail_percentage:6.2f}%)")
+      #             if skipped > 0:
+      #                 skip_percentage = (skipped / total * 100)
+      #                 print(f"⏭️  SKIPPED: {skipped:3d} tests ({skip_percentage:6.2f}%)")
+      #             print("-"*60)
+      #             print(f"📊 TOTAL:   {total:3d} tests (100.00%)")
+      #             print(f"📈 PASS RATE: {pass_percentage:.2f}%")
+      #             print("="*60)
+                  
+      #             # สถานะโดยรวม
+      #             if pass_percentage == 100:
+      #                 print("\n🎉 EXCELLENT! All tests passed!")
+      #                 status_emoji = "🎉"
+      #                 status_text = "Perfect"
+      #             elif pass_percentage >= 80:
+      #                 print("\n✅ GOOD! Most tests passed")
+      #                 status_emoji = "✅"
+      #                 status_text = "Good"
+      #             elif pass_percentage >= 60:
+      #                 print("\n⚠️  WARNING! Several tests failed")
+      #                 status_emoji = "⚠️"
+      #                 status_text = "Warning"
+      #             else:
+      #                 print("\n❌ CRITICAL! Many tests failed")
+      #                 status_emoji = "❌"
+      #                 status_text = "Critical"
+                  
+      #             # รายการ Test ที่ผ่าน
+      #             print("\n" + "="*60)
+      #             print("📋 TEST DETAILS")
+      #             print("="*60)
+
+      #             passed_tests = []
+      #             failed_tests = []
+      #             for test in root.iter('test'):
+      #                 test_name = test.get('name', 'Unknown')
+      #                 test_status = test.get('status', 'UNKNOWN')
+      #                 if test_status == 'PASS':
+      #                     passed_tests.append(test_name)
+      #                 elif test_status == 'FAIL':
+      #                     failed_tests.append(test_name)
+      #                     msg = test.find('.//msg[@level="FAIL"]')
+      #                     error_msg = msg.text if msg is not None and msg.text else "No error message"
+      #                     failed_tests.append(f"  └─ Error: {error_msg[:100]}")
+
+      #             print("Passed tests =", passed_tests)
+      #             print("Failed tests =", failed_tests)
+                  
+      #             # --- ประกาศ badge_data ที่นี่ ---
+      #             badge_data = {
+      #                 "passed": passed,
+      #                 "failed": failed,
+      #                 "skipped": skipped,
+      #                 "total": total,
+      #                 "pass_rate": round(pass_percentage, 2),
+      #                 "status": "Perfect"  # หรือจะใช้ status_text ตามเดิม
+      #             }
+
+      #             with open('results/test_summary.json', 'w') as f:
+      #                 json.dump(badge_data, f, indent=2)
+                  
+      #             # สร้าง Markdown สำหรับ GitHub Summary
+      #             with open('test_summary.md', 'w', encoding='utf-8') as f:
+      #                 f.write(f"# {status_emoji} Web Test Results\n\n")
+      #                 f.write("## 📊 Summary\n\n")
+      #                 f.write("| Status | Count | Test Names | Percentage |\n")
+      #                 f.write("|--------|-------|------------|------------|\n")
+                      
+      #                 # รายชื่อ test ที่ผ่าน
+      #                 passed_list = "<br>".join(passed_tests) if passed_tests else "-"
+      #                 f.write(f"| ✅ **Passed** | **{passed}** | {passed_list} | **{pass_percentage:.2f}%** |\n")
+                      
+      #                 # รายชื่อ test ที่ไม่ผ่าน + error
+      #                 if failed > 0:
+      #                     failed_pairs = []
+      #                     for i in range(0, len(failed_tests), 2):
+      #                         name = failed_tests[i]
+      #                         if i + 1 < len(failed_tests):
+      #                             error = failed_tests[i + 1][10:]  # ตัด '  └─ Error: ' ข้างหน้า
+      #                         else:
+      #                             error = ""
+      #                         failed_pairs.append(f"{name} <br><span style='color:#b33'>• {error}</span>")
+      #                     failed_list = "<br><br>".join(failed_pairs)
+      #                     f.write(f"| ❌ **Failed** | **{failed}** | {failed_list} | **{fail_percentage:.2f}%** |\n")
+
+      #                 # รวมทั้งหมด
+      #                 f.write(f"| 📊 **Total** | **{total}** | - | **100.00%** |\n\n")
+                  
+      #             print("\n✅ Summary files created successfully!")
+                  
+      #             # Set output variables for GitHub Actions
+      #             print(f"::set-output name=total::{total}")
+      #             print(f"::set-output name=passed::{passed}")
+      #             print(f"::set-output name=failed::{failed}")
+      #             print(f"::set-output name=pass_rate::{pass_percentage:.2f}")
+                  
+      #         except Exception as e:
+      #             print(f"❌ Error analyzing results: {str(e)}")
+          
+      #     if __name__ == "__main__":
+      #         analyze_robot_results()
+      #     PYTHON_SCRIPT
+          
+      #     # # รัน script วิเคราะห์ผล
+      #     python analyze_results.py
 
       - name: 🐞 List files after test summary
         run: |
