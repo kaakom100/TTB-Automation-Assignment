@@ -118,22 +118,19 @@ jobs:
                   # เก็บรายชื่อ Test
                   passed_tests = []
                   failed_tests = []
-                  failed_details = []
-                  
-                  for test in root.iter('test'):
+                  for test in root.findall('.//test'):
                       test_name = test.get('name', 'Unknown')
-                      test_status = test.get('status', 'UNKNOWN')
+                      test_status = test.find('./status').get('status', 'UNKNOWN')
                       if test_status == 'PASS':
                           passed_tests.append(test_name)
                       elif test_status == 'FAIL':
                           failed_tests.append(test_name)
                           msg = test.find('.//msg[@level="FAIL"]')
                           error_msg = msg.text if msg is not None and msg.text else "No error message"
-                          error_msg = error_msg.split('\n')[0][:80]
-                          failed_details.append({'name': test_name, 'error': error_msg})
+                          failed_tests.append(f"  └─ Error: {error_msg[:100]}")
 
-                  print(f"Passed tests = {passed_tests}")
-                  print(f"Failed tests = {failed_tests}")
+                  print("Passed tests =", passed_tests)
+                  print("Failed tests =", failed_tests)
                   
                   # สร้างไฟล์ JSON
                   badge_data = {
@@ -172,8 +169,8 @@ jobs:
                       # แสดงรายชื่อ Passed Tests
                       if passed > 0:
                           # รวมชื่อ test ทั้งหมดในบรรทัดเดียว ใช้ <br> คั่น
-                          passed_names = "<br>".join([f"✅ {name}" for name in passed_tests])
-                          f.write(f"| ✅ **Passed** | **{passed}** | {passed_names} | **{pass_percentage:.2f}%** |\n")
+                          passed_list = "<br>".join(passed_tests) if passed_tests else "-"
+                          f.write(f"| ✅ **Passed** | **{passed}** | {passed_list} | **{pass_percentage:.2f}%** |\n")
                       else:
                           f.write(f"| ✅ **Passed** | **0** | - | **0.00%** |\n")
                       
