@@ -209,6 +209,12 @@ jobs:
           # # รัน script วิเคราะห์ผล
           # python analyze_results.py
 
+      - name: 🐞 List files after test summary
+        run: |
+          pwd
+          ls -al
+          ls -al results || true
+
       - name: 📝 Update GitHub Job Summary
         if: always()
         run: |
