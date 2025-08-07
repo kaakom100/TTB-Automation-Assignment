@@ -18,45 +18,58 @@ jobs:
   setup-job:
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
-      - name: 🐍 Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12.4'
-      - name: Install Robot Framework
-        run: |
-          pip install -r requirements.txt
 
   test-api:
     needs: setup-job
     runs-on: ubuntu-latest
     steps:
-      - name: Copy repo from setup
-        uses: actions/checkout@v4
-      - name: 🧪 Run API Tests
+      - uses: actions/checkout@v4
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+      - name: Run API Tests
         run: |
           mkdir -p results
-          robot --outputdir results --output output.xml --log log.html --report report.html --name "API Tests" TestScript/API/API.robot || true
+          robot --outputdir results TestScript/API/API.robot
+      - name: Upload API Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-api
+          path: results/
 
   test-web:
     needs: setup-job
     runs-on: ubuntu-latest
     steps:
-      - name: Copy repo from setup
-        uses: actions/checkout@v4
-      - name: 🧪 Run Web Tests
+      - uses: actions/checkout@v4
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+      - name: Run Web Tests
         run: |
           mkdir -p results
-          robot --outputdir results --output output.xml --log log.html --report report.html --name "Web Tests" TestScript/Web/Staging/FlowLogin.robot || true
+          robot --outputdir results TestScript/Web/Staging/FlowLogin.robot
+      - name: Upload Web Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-web
+          path: results/
 
-  # (Optional) รวมผลหลังจาก API และ Web เสร็จ
   summary:
     needs: [test-api, test-web]
     runs-on: ubuntu-latest
     steps:
-      - name: สรุปผล/ดึง artifact หรืออะไรก็ว่าไป
-        run: echo "สรุปจ้า"
+      - uses: actions/checkout@v4
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-results/
+      - name: Show all result files
+        run: ls -R all-results/
+      # ตัวอย่าง: สมมติว่าใช้ Python summary script
+      - name: Generate & Print Test Summary
+        run: |
+          python scripts/summary.py
       
       # ============================================
       # STEP 3: Generate Test Report
