@@ -185,7 +185,7 @@ jobs:
                       # Total (รวมชื่อทั้ง Passed/Failed)
                       all_test_names = [t['name'] for t in passed_details] + [t['name'] for t in failed_details]
                       all_test_names_md = "<br>".join(all_test_names) if all_test_names else "-"          
-                      f.write(f"| 📊 **Total** | **{total}** | {total_list} | **100.00%** |\n\n")                  
+                      f.write(f"| 📊 **Total** | **{total}** | {all_test_names_md} | **100.00%** |\n\n")                  
                   
                   print("\n✅ Summary files created successfully!")
                   
