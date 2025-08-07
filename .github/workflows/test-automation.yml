@@ -117,20 +117,21 @@ jobs:
 
                   # เก็บรายชื่อ Test
                   passed_tests = []
-                  failed_tests = []
-                  for test in root.findall('.//test'):
-                      test_name = test.get('name', 'Unknown')
-                      test_status = test.find('./status').get('status', 'UNKNOWN')
-                      if test_status == 'PASS':
-                          passed_tests.append(test_name)
-                      elif test_status == 'FAIL':
-                          failed_tests.append(test_name)
-                          msg = test.find('.//msg[@level="FAIL"]')
-                          error_msg = msg.text if msg is not None and msg.text else "No error message"
-                          failed_tests.append(f"  └─ Error: {error_msg[:100]}")
+                  failed_details = []
+                  for suite in root.findall('.//suite'):
+                      for test in suite.findall('.//test'):
+                          name = test.get('name', 'Unknown')
+                          status = test.find('./status').get('status')
+                          if status == 'PASS':
+                              passed_tests.append(name)
+                          elif status == 'FAIL':
+                              msg_node = test.find('./status')
+                              error = msg_node.text.strip() if msg_node is not None and msg_node.text else "No error message"
+                              failed_details.append({'name': name, 'error': error})
 
-                  print("Passed tests =", passed_tests)
-                  print("Failed tests =", failed_tests)
+                  # Debug print
+                  print('passed_tests =', passed_tests)
+                  print('failed_details =', failed_details)
                   
                   # สร้างไฟล์ JSON
                   badge_data = {
@@ -185,21 +186,7 @@ jobs:
                           f.write(f"| ❌ **Failed** | **0** | - | **0.00%** |\n")
                       
                       # แสดง Total
-                      f.write(f"| 📊 **Total** | **{total}** | - | **100.00%** |\n\n")
-                      
-                      # # หรือถ้าอยากแสดงแบบแยก section
-                      # if passed_tests:
-                      #     f.write("### ✅ Passed Tests:\n")
-                      #     for test in passed_tests:
-                      #         f.write(f"- {test}\n")
-                      #     f.write("\n")
-                      
-                      # if failed_tests:
-                      #     f.write("### ❌ Failed Tests:\n")
-                      #     for detail in failed_details:
-                      #         f.write(f"- **{detail['name']}**\n")
-                      #         f.write(f"  - Error: `{detail['error']}`\n")
-                      #     f.write("\n")
+                      f.write(f"| 📊 **Total** | **{total}** | - | **100.00%** |\n\n")                  
                   
                   print("\n✅ Summary files created successfully!")
                   
@@ -246,3 +233,17 @@ jobs:
           path: results/
           retention-days: 30
                 
+
+                              # # หรือถ้าอยากแสดงแบบแยก section
+                      # if passed_tests:
+                      #     f.write("### ✅ Passed Tests:\n")
+                      #     for test in passed_tests:
+                      #         f.write(f"- {test}\n")
+                      #     f.write("\n")
+                      
+                      # if failed_tests:
+                      #     f.write("### ❌ Failed Tests:\n")
+                      #     for detail in failed_details:
+                      #         f.write(f"- **{detail['name']}**\n")
+                      #         f.write(f"  - Error: `{detail['error']}`\n")
+                      #     f.write("\n")
