@@ -252,33 +252,33 @@ jobs:
           # รัน script วิเคราะห์ผล
           python analyze_results.py
 
-      # - name: 📝 Update GitHub Job Summary
-      #   if: always()
-      #   run: |
-      #     # เพิ่ม Summary ใน GitHub
-      #     if [ -f "test_summary.md" ]; then
-      #       cat test_summary.md >> $GITHUB_STEP_SUMMARY
+      - name: 📝 Update GitHub Job Summary
+        if: always()
+        run: |
+          # เพิ่ม Summary ใน GitHub
+          if [ -f "test_summary.md" ]; then
+            cat test_summary.md >> $GITHUB_STEP_SUMMARY
             
-      #       # เพิ่มข้อมูลเพิ่มเติม
-      #       echo "" >> $GITHUB_STEP_SUMMARY
-      #       echo "---" >> $GITHUB_STEP_SUMMARY
-      #       echo "" >> $GITHUB_STEP_SUMMARY
-      #       echo "### 📌 Test Information" >> $GITHUB_STEP_SUMMARY
-      #       echo "" >> $GITHUB_STEP_SUMMARY
-      #       echo "- **Run Number:** #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
-      #       echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-      #       echo "- **Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-      #       echo "- **Runner:** ${{ runner.os }}" >> $GITHUB_STEP_SUMMARY
-      #       echo "- **Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-      #       echo "- **Workflow:** ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
-      #       echo "" >> $GITHUB_STEP_SUMMARY
-      #       echo "### 🔗 Quick Links" >> $GITHUB_STEP_SUMMARY
-      #       echo "" >> $GITHUB_STEP_SUMMARY
-      #       echo "- [📥 Download Full Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
-      #       echo "- [📊 View Test Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs)" >> $GITHUB_STEP_SUMMARY
-      #     else
-      #       echo "⚠️ No test summary available" >> $GITHUB_STEP_SUMMARY
-      #     fi
+            # เพิ่มข้อมูลเพิ่มเติม
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "---" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 📌 Test Information" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **Run Number:** #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **Runner:** ${{ runner.os }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Workflow:** ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 🔗 Quick Links" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- [📥 Download Full Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+            echo "- [📊 View Test Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ No test summary available" >> $GITHUB_STEP_SUMMARY
+          fi
 
       # - name: 📝 Update GitHub Job Summary
       #   if: always()
