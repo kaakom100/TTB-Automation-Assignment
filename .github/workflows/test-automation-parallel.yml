@@ -1,307 +1,307 @@
-# ===============================================
-# Parallel Test Automation Pipeline
-# ===============================================
+# # ===============================================
+# # Parallel Test Automation Pipeline
+# # ===============================================
 
-name: 🤖 Automated Test Results
+# name: 🤖 Automated Test Results
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+# on:
+#   push:
+#     branches: [ main ]
+#   workflow_dispatch:
 
-jobs:
-  # ============================================
-  # JOB 1: Web Testing
-  # ============================================
-  test-web:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📥 Checkout code
-        uses: actions/checkout@v4
+# jobs:
+#   # ============================================
+#   # JOB 1: Web Testing
+#   # ============================================
+#   test-web:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: 📥 Checkout code
+#         uses: actions/checkout@v4
       
-      - name: 📥 Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12.4'
+#       - name: 📥 Setup Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.12.4'
       
-      - name: 📥 Install dependencies
-        run: |
-          pip install -r requirements.txt
+#       - name: 📥 Install dependencies
+#         run: |
+#           pip install -r requirements.txt
       
-      - name: 🧪 Run Web Tests
-        run: |
-          mkdir -p results/web
-          robot \
-            --variable BROWSER:headlesschrome \
-            --outputdir results/web \
-            --output output.xml \
-            --log log.html \
-            --report report.html \
-            --name "Web Tests" \
-            TestScript/Web/Staging/FlowLogin.robot || true
+#       - name: 🧪 Run Web Tests
+#         run: |
+#           mkdir -p results/web
+#           robot \
+#             --variable BROWSER:headlesschrome \
+#             --outputdir results/web \
+#             --output output.xml \
+#             --log log.html \
+#             --report report.html \
+#             --name "Web Tests" \
+#             TestScript/Web/Staging/FlowLogin.robot || true
       
-      - name: 📊 Generate Web Summary
-        if: always()
-        run: |
-          cat > analyze_web.py << 'EOF'
-          import xml.etree.ElementTree as ET
-          import json
+#       - name: 📊 Generate Web Summary
+#         if: always()
+#         run: |
+#           cat > analyze_web.py << 'EOF'
+#           import xml.etree.ElementTree as ET
+#           import json
           
-          tree = ET.parse('results/web/output.xml')
-          root = tree.getroot()
-          stats = root.find('.//statistics/total/stat')
+#           tree = ET.parse('results/web/output.xml')
+#           root = tree.getroot()
+#           stats = root.find('.//statistics/total/stat')
           
-          passed = int(stats.get('pass', 0))
-          failed = int(stats.get('fail', 0))
-          total = passed + failed
+#           passed = int(stats.get('pass', 0))
+#           failed = int(stats.get('fail', 0))
+#           total = passed + failed
           
-          summary = {
-              "type": "web",
-              "passed": passed,
-              "failed": failed,
-              "total": total,
-              "pass_rate": round((passed/total*100), 2) if total > 0 else 0
-          }
+#           summary = {
+#               "type": "web",
+#               "passed": passed,
+#               "failed": failed,
+#               "total": total,
+#               "pass_rate": round((passed/total*100), 2) if total > 0 else 0
+#           }
           
-          with open('results/web/summary.json', 'w') as f:
-              json.dump(summary, f, indent=2)
+#           with open('results/web/summary.json', 'w') as f:
+#               json.dump(summary, f, indent=2)
           
-          print(f"✅ Web Tests: {passed}/{total} passed ({summary['pass_rate']}%)")
-          EOF
+#           print(f"✅ Web Tests: {passed}/{total} passed ({summary['pass_rate']}%)")
+#           EOF
           
-          python analyze_web.py
+#           python analyze_web.py
       
-      - name: 📤 Upload Web Results
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-results
-          path: results/web/
+#       - name: 📤 Upload Web Results
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: web-results
+#           path: results/web/
 
-  # ============================================
-  # JOB 2: API Testing
-  # ============================================
-  test-api:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📥 Checkout code
-        uses: actions/checkout@v4
+#   # ============================================
+#   # JOB 2: API Testing
+#   # ============================================
+#   test-api:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: 📥 Checkout code
+#         uses: actions/checkout@v4
       
-      - name: 📥 Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12.4'
+#       - name: 📥 Setup Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.12.4'
       
-      - name: 📥 Install dependencies
-        run: |
-          pip install -r requirements.txt
+#       - name: 📥 Install dependencies
+#         run: |
+#           pip install -r requirements.txt
       
-      - name: 🧪 Run API Tests
-        run: |
-          mkdir -p results/api
-          robot \
-            --outputdir results/api \
-            --output output.xml \
-            --log log.html \
-            --report report.html \
-            --name "API Tests" \
-            TestScript/API/API.robot || true
+#       - name: 🧪 Run API Tests
+#         run: |
+#           mkdir -p results/api
+#           robot \
+#             --outputdir results/api \
+#             --output output.xml \
+#             --log log.html \
+#             --report report.html \
+#             --name "API Tests" \
+#             TestScript/API/API.robot || true
       
-      - name: 📊 Generate API Summary
-        if: always()
-        run: |
-          cat > analyze_api.py << 'EOF'
-          import xml.etree.ElementTree as ET
-          import json
+#       - name: 📊 Generate API Summary
+#         if: always()
+#         run: |
+#           cat > analyze_api.py << 'EOF'
+#           import xml.etree.ElementTree as ET
+#           import json
           
-          tree = ET.parse('results/api/output.xml')
-          root = tree.getroot()
-          stats = root.find('.//statistics/total/stat')
+#           tree = ET.parse('results/api/output.xml')
+#           root = tree.getroot()
+#           stats = root.find('.//statistics/total/stat')
           
-          passed = int(stats.get('pass', 0))
-          failed = int(stats.get('fail', 0))
-          total = passed + failed
+#           passed = int(stats.get('pass', 0))
+#           failed = int(stats.get('fail', 0))
+#           total = passed + failed
           
-          summary = {
-              "type": "api",
-              "passed": passed,
-              "failed": failed,
-              "total": total,
-              "pass_rate": round((passed/total*100), 2) if total > 0 else 0
-          }
+#           summary = {
+#               "type": "api",
+#               "passed": passed,
+#               "failed": failed,
+#               "total": total,
+#               "pass_rate": round((passed/total*100), 2) if total > 0 else 0
+#           }
           
-          with open('results/api/summary.json', 'w') as f:
-              json.dump(summary, f, indent=2)
+#           with open('results/api/summary.json', 'w') as f:
+#               json.dump(summary, f, indent=2)
           
-          print(f"✅ API Tests: {passed}/{total} passed ({summary['pass_rate']}%)")
-          EOF
+#           print(f"✅ API Tests: {passed}/{total} passed ({summary['pass_rate']}%)")
+#           EOF
           
-          python analyze_api.py
+#           python analyze_api.py
       
-      - name: 📤 Upload API Results
-        uses: actions/upload-artifact@v4
-        with:
-          name: api-results
-          path: results/api/
+#       - name: 📤 Upload API Results
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: api-results
+#           path: results/api/
 
-  # ============================================
-  # JOB 3: Combined Summary Report
-  # ============================================
-  summary:
-    needs: [test-web, test-api]
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
-      - name: 📥 Download Web Results
-        uses: actions/download-artifact@v4
-        with:
-          name: web-results
-          path: web-results/
+#   # ============================================
+#   # JOB 3: Combined Summary Report
+#   # ============================================
+#   summary:
+#     needs: [test-web, test-api]
+#     runs-on: ubuntu-latest
+#     if: always()
+#     steps:
+#       - name: 📥 Download Web Results
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: web-results
+#           path: web-results/
       
-      - name: 📥 Download API Results
-        uses: actions/download-artifact@v4
-        with:
-          name: api-results
-          path: api-results/
+#       - name: 📥 Download API Results
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: api-results
+#           path: api-results/
       
-      - name: 📊 Generate Combined Report
-        run: |
-          cat > generate_report.py << 'EOF'
-          import json
-          import xml.etree.ElementTree as ET
-          import os
-          from datetime import datetime
+#       - name: 📊 Generate Combined Report
+#         run: |
+#           cat > generate_report.py << 'EOF'
+#           import json
+#           import xml.etree.ElementTree as ET
+#           import os
+#           from datetime import datetime
           
-          def parse_xml(xml_path, test_type):
-              """Parse Robot Framework XML and extract test details"""
-              if not os.path.exists(xml_path):
-                  return None
+#           def parse_xml(xml_path, test_type):
+#               """Parse Robot Framework XML and extract test details"""
+#               if not os.path.exists(xml_path):
+#                   return None
                   
-              tree = ET.parse(xml_path)
-              root = tree.getroot()
+#               tree = ET.parse(xml_path)
+#               root = tree.getroot()
               
-              stats = root.find('.//statistics/total/stat')
-              passed = int(stats.get('pass', 0))
-              failed = int(stats.get('fail', 0))
-              total = passed + failed
+#               stats = root.find('.//statistics/total/stat')
+#               passed = int(stats.get('pass', 0))
+#               failed = int(stats.get('fail', 0))
+#               total = passed + failed
               
-              # Extract test details
-              tests = []
-              for suite in root.findall('.//suite'):
-                  for test in suite.findall('.//test'):
-                      name = test.get('name', 'Unknown')
-                      status = test.find('./status').get('status')
+#               # Extract test details
+#               tests = []
+#               for suite in root.findall('.//suite'):
+#                   for test in suite.findall('.//test'):
+#                       name = test.get('name', 'Unknown')
+#                       status = test.find('./status').get('status')
                       
-                      # Get error message if failed
-                      error_msg = ""
-                      if status == 'FAIL':
-                          msg_node = test.find('./status')
-                          if msg_node is not None and msg_node.text:
-                              error_msg = msg_node.text.strip()[:100]  # Limit error message length
+#                       # Get error message if failed
+#                       error_msg = ""
+#                       if status == 'FAIL':
+#                           msg_node = test.find('./status')
+#                           if msg_node is not None and msg_node.text:
+#                               error_msg = msg_node.text.strip()[:100]  # Limit error message length
                       
-                      tests.append({
-                          'name': name,
-                          'status': status,
-                          'error': error_msg,
-                          'type': test_type
-                      })
+#                       tests.append({
+#                           'name': name,
+#                           'status': status,
+#                           'error': error_msg,
+#                           'type': test_type
+#                       })
               
-              return {
-                  'passed': passed,
-                  'failed': failed,
-                  'total': total,
-                  'pass_rate': round((passed/total*100), 2) if total > 0 else 0,
-                  'tests': tests
-              }
+#               return {
+#                   'passed': passed,
+#                   'failed': failed,
+#                   'total': total,
+#                   'pass_rate': round((passed/total*100), 2) if total > 0 else 0,
+#                   'tests': tests
+#               }
           
-          # Parse both test results
-          web_results = parse_xml('web-results/output.xml', 'Web')
-          api_results = parse_xml('api-results/output.xml', 'API')
+#           # Parse both test results
+#           web_results = parse_xml('web-results/output.xml', 'Web')
+#           api_results = parse_xml('api-results/output.xml', 'API')
           
-          # Calculate combined statistics
-          total_passed = (web_results['passed'] if web_results else 0) + (api_results['passed'] if api_results else 0)
-          total_failed = (web_results['failed'] if web_results else 0) + (api_results['failed'] if api_results else 0)
-          total_tests = total_passed + total_failed
-          overall_pass_rate = round((total_passed/total_tests*100), 2) if total_tests > 0 else 0
+#           # Calculate combined statistics
+#           total_passed = (web_results['passed'] if web_results else 0) + (api_results['passed'] if api_results else 0)
+#           total_failed = (web_results['failed'] if web_results else 0) + (api_results['failed'] if api_results else 0)
+#           total_tests = total_passed + total_failed
+#           overall_pass_rate = round((total_passed/total_tests*100), 2) if total_tests > 0 else 0
           
-          # Generate Markdown report
-          with open('test_summary.md', 'w', encoding='utf-8') as f:
-              # Header with overall status
-              if overall_pass_rate == 100:
-                  f.write("# ✅ All Tests Passed!\n\n")
-              elif overall_pass_rate == 0:
-                  f.write("# ❌ All Tests Failed!\n\n")
-              else:
-                  f.write("# ⚠️ Test Summary\n\n")
+#           # Generate Markdown report
+#           with open('test_summary.md', 'w', encoding='utf-8') as f:
+#               # Header with overall status
+#               if overall_pass_rate == 100:
+#                   f.write("# ✅ All Tests Passed!\n\n")
+#               elif overall_pass_rate == 0:
+#                   f.write("# ❌ All Tests Failed!\n\n")
+#               else:
+#                   f.write("# ⚠️ Test Summary\n\n")
               
-              # Overall Summary
-              f.write("## 📊 Overall Summary\n\n")
-              f.write(f"**Total Pass Rate:** {overall_pass_rate}% ({total_passed}/{total_tests})\n\n")
+#               # Overall Summary
+#               f.write("## 📊 Overall Summary\n\n")
+#               f.write(f"**Total Pass Rate:** {overall_pass_rate}% ({total_passed}/{total_tests})\n\n")
               
-              # Test Type Breakdown
-              f.write("## 📈 Test Breakdown by Type\n\n")
-              f.write("| Test Type | Passed | Failed | Total | Pass Rate |\n")
-              f.write("|-----------|--------|--------|-------|----------|\n")
+#               # Test Type Breakdown
+#               f.write("## 📈 Test Breakdown by Type\n\n")
+#               f.write("| Test Type | Passed | Failed | Total | Pass Rate |\n")
+#               f.write("|-----------|--------|--------|-------|----------|\n")
               
-              # Web Tests Row
-              if web_results:
-                  f.write(f"| Web Tests | {web_results['passed']} | {web_results['failed']} | {web_results['total']} | {web_results['pass_rate']}% |\n")
-              else:
-                  f.write("| Web Tests | ⏭️ | - | - | - | **N/A** |\n")
+#               # Web Tests Row
+#               if web_results:
+#                   f.write(f"| Web | {web_results['passed']} | {web_results['failed']} | {web_results['total']} | {web_results['pass_rate']}% |\n")
+#               else:
+#                   f.write("| Web | ⏭️ | - | - | - | **N/A** |\n")
               
-              # API Tests Row
-              if api_results:
-                  f.write(f"| API Tests | {api_results['passed']} | {api_results['failed']} | {api_results['total']} | {api_results['pass_rate']}% |\n")
-              else:
-                  f.write("| API Tests | ⏭️ | - | - | - | **N/A** |\n")
+#               # API Tests Row
+#               if api_results:
+#                   f.write(f"| API | {api_results['passed']} | {api_results['failed']} | {api_results['total']} | {api_results['pass_rate']}% |\n")
+#               else:
+#                   f.write("| API | ⏭️ | - | - | - | **N/A** |\n")
               
-              # Total Row
-              f.write(f"| **TOTAL** | **{total_passed}** | **{total_failed}** | **{total_tests}** | **{overall_pass_rate}%** |\n\n")
+#               # Total Row
+#               f.write(f"| **Total** | **{total_passed}** | **{total_failed}** | **{total_tests}** | **{overall_pass_rate}%** |\n\n")
                        
-              # Execution Details
-              f.write("## 📝 Execution Details\n\n")
-              f.write(f"- **Execution Time:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}\n")
-              f.write(f"- **Branch:** ${{ github.ref_name }}\n")
-              f.write(f"- **Triggered by:** @${{ github.actor }}\n")
-              f.write(f"- **Workflow:** ${{ github.workflow }}\n")
+#               # Execution Details
+#               f.write("## 📝 Execution Details\n\n")
+#               f.write(f"- **Execution Time:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}\n")
+#               f.write(f"- **Branch:** ${{ github.ref_name }}\n")
+#               f.write(f"- **Triggered by:** @${{ github.actor }}\n")
+#               f.write(f"- **Workflow:** ${{ github.workflow }}\n")
               
-          print("\n" + "="*60)
-          print("📊 COMBINED TEST RESULTS")
-          print("="*60)
-          print(f"Web Tests:  {web_results['passed'] if web_results else 0}/{web_results['total'] if web_results else 0} passed")
-          print(f"API Tests:  {api_results['passed'] if api_results else 0}/{api_results['total'] if api_results else 0} passed")
-          print("-"*60)
-          print(f"TOTAL:      {total_passed}/{total_tests} passed ({overall_pass_rate}%)")
-          print("="*60)
-          EOF
+#           print("\n" + "="*60)
+#           print("📊 COMBINED TEST RESULTS")
+#           print("="*60)
+#           print(f"Web Tests:  {web_results['passed'] if web_results else 0}/{web_results['total'] if web_results else 0} passed")
+#           print(f"API Tests:  {api_results['passed'] if api_results else 0}/{api_results['total'] if api_results else 0} passed")
+#           print("-"*60)
+#           print(f"TOTAL:      {total_passed}/{total_tests} passed ({overall_pass_rate}%)")
+#           print("="*60)
+#           EOF
           
-          python generate_report.py
+#           python generate_report.py
       
-      - name: 📝 Update GitHub Job Summary
-        if: always()
-        run: |
-          if [ -f "test_summary.md" ]; then
-            cat test_summary.md >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ No test summary available" >> $GITHUB_STEP_SUMMARY
-          fi
+#       - name: 📝 Update GitHub Job Summary
+#         if: always()
+#         run: |
+#           if [ -f "test_summary.md" ]; then
+#             cat test_summary.md >> $GITHUB_STEP_SUMMARY
+#           else
+#             echo "⚠️ No test summary available" >> $GITHUB_STEP_SUMMARY
+#           fi
       
-      - name: 🗓️ Set current date and time
-        id: datetime
-        run: echo "datetime=$(TZ='Asia/Bangkok' date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_OUTPUT
+#       - name: 🗓️ Set current date and time
+#         id: datetime
+#         run: echo "datetime=$(TZ='Asia/Bangkok' date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_OUTPUT
       
-      - name: 📦 Create Combined Artifact
-        if: always()
-        run: |
-          mkdir -p combined-results
-          cp -r web-results/* combined-results/web/ 2>/dev/null || true
-          cp -r api-results/* combined-results/api/ 2>/dev/null || true
-          cp test_summary.md combined-results/ 2>/dev/null || true
+#       - name: 📦 Create Combined Artifact
+#         if: always()
+#         run: |
+#           mkdir -p combined-results
+#           cp -r web-results/* combined-results/web/ 2>/dev/null || true
+#           cp -r api-results/* combined-results/api/ 2>/dev/null || true
+#           cp test_summary.md combined-results/ 2>/dev/null || true
       
-      - name: 📤 Upload Combined Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Test-Results-${{ steps.datetime.outputs.datetime }}
-          path: combined-results/
-          retention-days: 30
+#       - name: 📤 Upload Combined Results
+#         if: always()
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: Test-Results-${{ steps.datetime.outputs.datetime }}
+#           path: combined-results/
+#           retention-days: 30
       

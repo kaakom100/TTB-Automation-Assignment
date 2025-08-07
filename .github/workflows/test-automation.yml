@@ -1,253 +1,253 @@
-# # ===============================================
-# # ไฟล์นี้คือตัวที่จะรันเทสให้เราอัตโนมัติ
-# # ===============================================
+# ===============================================
+# ไฟล์นี้คือตัวที่จะรันเทสให้เราอัตโนมัติ
+# ===============================================
 
-# # ชื่อที่จะแสดงใน GitHub เมื่อกดปุ่ม Run บน GitHub
-# name: 🤖 Automated Test Results
+# ชื่อที่จะแสดงใน GitHub เมื่อกดปุ่ม Run บน GitHub
+name: 🤖 Automated Test Results
 
-# # กำหนดว่าจะรันเมื่อไหร่
-# on:
-#   # รันเมื่อ push code ไปที่ branch main
-#   push:
-#     branches: [ main ]
-#   # รันเมื่อกดปุ่มรันเองใน GitHub
-#   workflow_dispatch:
+# กำหนดว่าจะรันเมื่อไหร่
+on:
+  # รันเมื่อ push code ไปที่ branch main
+  push:
+    branches: [ main ]
+  # รันเมื่อกดปุ่มรันเองใน GitHub
+  workflow_dispatch:
 
-# # งานที่จะทำ
-# jobs:
-#   # ชื่องาน: test-web
-#   test-web:
-#     # ใช้คอมพิวเตอร์ Ubuntu (Linux) ของ GitHub
-#     runs-on: ubuntu-latest
+# งานที่จะทำ
+jobs:
+  # ชื่องาน: test-web
+  test-web:
+    # ใช้คอมพิวเตอร์ Ubuntu (Linux) ของ GitHub
+    runs-on: ubuntu-latest
     
-#     # ขั้นตอนการทำงาน
-#     steps:
-#       # ============================================
-#       # STEP 1: Setup Environment
-#       # ============================================
-#       # ขั้นตอนที่ 1: ดึง code จาก GitHub
-#       - name: 📥 Checkout code
-#         uses: actions/checkout@v4
+    # ขั้นตอนการทำงาน
+    steps:
+      # ============================================
+      # STEP 1: Setup Environment
+      # ============================================
+      # ขั้นตอนที่ 1: ดึง code จาก GitHub
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
       
-#       # ขั้นตอนที่ 2: ติดตั้ง Python
-#       - name: 📥 Setup Python
-#         uses: actions/setup-python@v4
-#         with:
-#           python-version: '3.12.4'
+      # ขั้นตอนที่ 2: ติดตั้ง Python
+      - name: 📥 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.4'
       
-#       # ขั้นตอนที่ 3: ติดตั้ง Robot Framework
-#       - name: 📥 Install Robot Framework
-#         run: |
-#           pip install -r requirements.txt
+      # ขั้นตอนที่ 3: ติดตั้ง Robot Framework
+      - name: 📥 Install Robot Framework
+        run: |
+          pip install -r requirements.txt
 
-#       # ============================================
-#       # STEP 2: Run Tests
-#       # ============================================
-#       - name: 🧪 Run Web Tests Only
-#         run: |
-#           mkdir -p results
+      # ============================================
+      # STEP 2: Run Tests
+      # ============================================
+      - name: 🧪 Run Web Tests Only
+        run: |
+          mkdir -p results
           
-#           # วิธีที่ 1: รันเฉพาะโฟลเดอร์ Web
-#           robot \
-#             --variable BROWSER:headlesschrome \
-#             --outputdir results \
-#             --output output.xml \
-#             --log log.html \
-#             --report report.html \
-#             --name "Web Tests" \
-#             TestScript/Web/Staging/FlowLogin.robot || true
+          # วิธีที่ 1: รันเฉพาะโฟลเดอร์ Web
+          robot \
+            --variable BROWSER:headlesschrome \
+            --outputdir results \
+            --output output.xml \
+            --log log.html \
+            --report report.html \
+            --name "Web Tests" \
+            TestScript/Web/Staging/FlowLogin.robot || true
           
-#           # แสดงผลทันทีหลังรัน
-#           echo "================================"
-#           echo "Test execution completed with exit code: ${EXIT_CODE:-0}"
-#           echo "================================"
+          # แสดงผลทันทีหลังรัน
+          echo "================================"
+          echo "Test execution completed with exit code: ${EXIT_CODE:-0}"
+          echo "================================"
       
-#       # ============================================
-#       # STEP 3: Generate Test Report
-#       # ============================================
-#       - name: 📊 Generate Test Summary Report
-#         if: always()
-#         run: |
-#           # สร้าง Python script สำหรับวิเคราะห์ผล
-#           cat > analyze_results.py << 'PYTHON_SCRIPT'
-#           import xml.etree.ElementTree as ET
-#           import os
-#           import json
+      # ============================================
+      # STEP 3: Generate Test Report
+      # ============================================
+      - name: 📊 Generate Test Summary Report
+        if: always()
+        run: |
+          # สร้าง Python script สำหรับวิเคราะห์ผล
+          cat > analyze_results.py << 'PYTHON_SCRIPT'
+          import xml.etree.ElementTree as ET
+          import os
+          import json
           
-#           def analyze_robot_results():
-#               xml_file = 'results/output.xml'
+          def analyze_robot_results():
+              xml_file = 'results/output.xml'
               
-#               if not os.path.exists(xml_file):
-#                   print("❌ ไม่พบไฟล์ผลการทดสอบ")
-#                   return
+              if not os.path.exists(xml_file):
+                  print("❌ ไม่พบไฟล์ผลการทดสอบ")
+                  return
               
-#               try:
-#                   tree = ET.parse(xml_file)
-#                   root = tree.getroot()
+              try:
+                  tree = ET.parse(xml_file)
+                  root = tree.getroot()
                   
-#                   # ดึงสถิติหลัก
-#                   stats = root.find('.//statistics/total/stat')
-#                   if stats is None:
-#                       print("❌ ไม่พบข้อมูลสถิติในไฟล์")
-#                       return
+                  # ดึงสถิติหลัก
+                  stats = root.find('.//statistics/total/stat')
+                  if stats is None:
+                      print("❌ ไม่พบข้อมูลสถิติในไฟล์")
+                      return
                   
-#                   # นับจำนวน Pass/Fail/Skip
-#                   passed = int(stats.get('pass', 0))
-#                   failed = int(stats.get('fail', 0))
-#                   skipped = int(stats.get('skip', 0))
-#                   total = passed + failed + skipped
+                  # นับจำนวน Pass/Fail/Skip
+                  passed = int(stats.get('pass', 0))
+                  failed = int(stats.get('fail', 0))
+                  skipped = int(stats.get('skip', 0))
+                  total = passed + failed + skipped
                   
-#                   # คำนวณเปอร์เซ็นต์
-#                   pass_percentage = (passed / total * 100) if total > 0 else 0
-#                   fail_percentage = (failed / total * 100) if total > 0 else 0
+                  # คำนวณเปอร์เซ็นต์
+                  pass_percentage = (passed / total * 100) if total > 0 else 0
+                  fail_percentage = (failed / total * 100) if total > 0 else 0
                   
-#                   # แสดงผลใน Console
-#                   print("\n" + "="*60)
-#                   print("📊 WEB TEST EXECUTION SUMMARY")
-#                   print("="*60)
-#                   print(f"✅ PASSED:  {passed:3d} tests ({pass_percentage:6.2f}%)")
-#                   print(f"❌ FAILED:  {failed:3d} tests ({fail_percentage:6.2f}%)")
-#                   if skipped > 0:
-#                       skip_percentage = (skipped / total * 100)
-#                       print(f"⏭️  SKIPPED: {skipped:3d} tests ({skip_percentage:6.2f}%)")
-#                   print("-"*60)
-#                   print(f"📊 TOTAL:   {total:3d} tests (100.00%)")
-#                   print(f"📈 PASS RATE: {pass_percentage:.2f}%")
-#                   print("="*60)
+                  # แสดงผลใน Console
+                  print("\n" + "="*60)
+                  print("📊 WEB TEST EXECUTION SUMMARY")
+                  print("="*60)
+                  print(f"✅ PASSED:  {passed:3d} tests ({pass_percentage:6.2f}%)")
+                  print(f"❌ FAILED:  {failed:3d} tests ({fail_percentage:6.2f}%)")
+                  if skipped > 0:
+                      skip_percentage = (skipped / total * 100)
+                      print(f"⏭️  SKIPPED: {skipped:3d} tests ({skip_percentage:6.2f}%)")
+                  print("-"*60)
+                  print(f"📊 TOTAL:   {total:3d} tests (100.00%)")
+                  print(f"📈 PASS RATE: {pass_percentage:.2f}%")
+                  print("="*60)
 
-#                   # เก็บรายชื่อ Test
-#                   passed_details = []
-#                   failed_details = []
-#                   passed_tests = []  # เอาไว้ใช้โชว์ row passed เฉยๆ
+                  # เก็บรายชื่อ Test
+                  passed_details = []
+                  failed_details = []
+                  passed_tests = []  # เอาไว้ใช้โชว์ row passed เฉยๆ
 
-#                   for suite in root.findall('.//suite'):
-#                       for test in suite.findall('.//test'):
-#                           name = test.get('name', 'Unknown')
-#                           status = test.find('./status').get('status')
-#                           if status == 'PASS':
-#                               passed_details.append({'name': name, 'error': ''})
-#                               passed_tests.append(name)
-#                           elif status == 'FAIL':
-#                               msg_node = test.find('./status')
-#                               error = msg_node.text.strip() if msg_node is not None and msg_node.text else "No error message"
-#                               failed_details.append({'name': name, 'error': error})
+                  for suite in root.findall('.//suite'):
+                      for test in suite.findall('.//test'):
+                          name = test.get('name', 'Unknown')
+                          status = test.find('./status').get('status')
+                          if status == 'PASS':
+                              passed_details.append({'name': name, 'error': ''})
+                              passed_tests.append(name)
+                          elif status == 'FAIL':
+                              msg_node = test.find('./status')
+                              error = msg_node.text.strip() if msg_node is not None and msg_node.text else "No error message"
+                              failed_details.append({'name': name, 'error': error})
 
-#                   # Debug print
-#                   print('passed_tests =', passed_tests)
-#                   print('failed_details =', failed_details)
+                  # Debug print
+                  print('passed_tests =', passed_tests)
+                  print('failed_details =', failed_details)
                   
-#                   # สร้างไฟล์ JSON
-#                   badge_data = {
-#                       "passed": passed,
-#                       "failed": failed,
-#                       "skipped": skipped,
-#                       "total": total,
-#                       "pass_rate": round(pass_percentage, 2),
-#                       "status": "Perfect" if pass_percentage == 100 else "Good" if pass_percentage >= 80 else "Warning"
-#                   }
+                  # สร้างไฟล์ JSON
+                  badge_data = {
+                      "passed": passed,
+                      "failed": failed,
+                      "skipped": skipped,
+                      "total": total,
+                      "pass_rate": round(pass_percentage, 2),
+                      "status": "Perfect" if pass_percentage == 100 else "Good" if pass_percentage >= 80 else "Warning"
+                  }
 
-#                   os.makedirs('results', exist_ok=True)
-#                   with open('results/test_summary.json', 'w') as f:
-#                       json.dump(badge_data, f, indent=2)
+                  os.makedirs('results', exist_ok=True)
+                  with open('results/test_summary.json', 'w') as f:
+                      json.dump(badge_data, f, indent=2)
                   
-#                   # สร้าง Markdown สำหรับ GitHub Summary
-#                   with open('test_summary.md', 'w', encoding='utf-8') as f:
-#                       # Header
-#                       if pass_percentage == 100:
-#                           f.write("# ✅ All Tests Passed!\n\n")
-#                           status_emoji = "✅"
-#                       elif pass_percentage == 0:
-#                           f.write("# ❌ All Tests Failed!\n\n")
-#                           status_emoji = "❌"
-#                       else:
-#                           f.write("# ⚠️ Test Summary\n\n")
-#                           status_emoji = "⚠️"
+                  # สร้าง Markdown สำหรับ GitHub Summary
+                  with open('test_summary.md', 'w', encoding='utf-8') as f:
+                      # Header
+                      if pass_percentage == 100:
+                          f.write("# ✅ All Tests Passed!\n\n")
+                          status_emoji = "✅"
+                      elif pass_percentage == 0:
+                          f.write("# ❌ All Tests Failed!\n\n")
+                          status_emoji = "❌"
+                      else:
+                          f.write("# ⚠️ Test Summary\n\n")
+                          status_emoji = "⚠️"
                       
-#                       f.write("## 📊 Summary\n\n")
-#                       f.write("| Status | Count | Test Case Name | Percentage |\n")
-#                       f.write("|--------|-------|------------|------------|\n")
+                      f.write("## 📊 Summary\n\n")
+                      f.write("| Status | Count | Test Case Name | Percentage |\n")
+                      f.write("|--------|-------|------------|------------|\n")
                       
-#                       # Passed (แสดงรายชื่อ Passed Tests)
-#                       if passed > 0:
-#                           # รวมชื่อ test ทั้งหมดในบรรทัดเดียว ใช้ <br> คั่น
-#                           passed_list = "<br>".join(passed_tests) if passed_tests else "-"
-#                           f.write(f"| ✅ **Passed** | **{passed}** | {passed_list} | **{pass_percentage:.2f}%** |\n")
-#                       else:
-#                           f.write(f"| ✅ **Passed** | **0** | - | **0.00%** |\n")
+                      # Passed (แสดงรายชื่อ Passed Tests)
+                      if passed > 0:
+                          # รวมชื่อ test ทั้งหมดในบรรทัดเดียว ใช้ <br> คั่น
+                          passed_list = "<br>".join(passed_tests) if passed_tests else "-"
+                          f.write(f"| ✅ **Passed** | **{passed}** | {passed_list} | **{pass_percentage:.2f}%** |\n")
+                      else:
+                          f.write(f"| ✅ **Passed** | **0** | - | **0.00%** |\n")
                       
-#                       # Fail (แสดงรายชื่อ Failed Tests พร้อม error)
-#                       if failed > 0:
-#                           failed_info = []
-#                           for detail in failed_details:
-#                               failed_info.append(f"{detail['name']}<br><small>({detail['error']})</small>")
-#                           failed_names = "<br><br>".join(failed_info)
-#                           f.write(f"| ❌ **Failed** | **{failed}** | {failed_names} | **{fail_percentage:.2f}%** |\n")
-#                       else:
-#                           f.write(f"| ❌ **Failed** | **0** | - | **0.00%** |\n")
+                      # Fail (แสดงรายชื่อ Failed Tests พร้อม error)
+                      if failed > 0:
+                          failed_info = []
+                          for detail in failed_details:
+                              failed_info.append(f"{detail['name']}<br><small>({detail['error']})</small>")
+                          failed_names = "<br><br>".join(failed_info)
+                          f.write(f"| ❌ **Failed** | **{failed}** | {failed_names} | **{fail_percentage:.2f}%** |\n")
+                      else:
+                          f.write(f"| ❌ **Failed** | **0** | - | **0.00%** |\n")
 
-#                       # Total (แยก Passed/Failed พร้อมไอคอน)
-#                       all_names_md = ""
-#                       if passed_details:
-#                           all_names_md += "<b>✅ Passed</b><br>"
-#                           for t in passed_details:
-#                               all_names_md += f"- {t['name']}<br>"
-#                           all_names_md += "<br>"
-#                       if failed_details:
-#                           all_names_md += "<b>❌ Failed</b><br>"
-#                           for t in failed_details:
-#                               all_names_md += f"- {t['name']}<br>"
-#                       # ลบ <br> ท้ายสุดถ้ามี
-#                       if all_names_md.endswith("<br>"):
-#                           all_names_md = all_names_md[:-4]
-#                       if not all_names_md.strip():
-#                           all_names_md = "-"
-#                       f.write(f"| 📊 **Total** | **{total}** | {all_names_md} | **100.00%** |\n\n")
+                      # Total (แยก Passed/Failed พร้อมไอคอน)
+                      all_names_md = ""
+                      if passed_details:
+                          all_names_md += "<b>✅ Passed</b><br>"
+                          for t in passed_details:
+                              all_names_md += f"- {t['name']}<br>"
+                          all_names_md += "<br>"
+                      if failed_details:
+                          all_names_md += "<b>❌ Failed</b><br>"
+                          for t in failed_details:
+                              all_names_md += f"- {t['name']}<br>"
+                      # ลบ <br> ท้ายสุดถ้ามี
+                      if all_names_md.endswith("<br>"):
+                          all_names_md = all_names_md[:-4]
+                      if not all_names_md.strip():
+                          all_names_md = "-"
+                      f.write(f"| 📊 **Total** | **{total}** | {all_names_md} | **100.00%** |\n\n")
                       
-#                   print("\n✅ Summary files created successfully!")
+                  print("\n✅ Summary files created successfully!")
                   
-#               except Exception as e:
-#                   print(f"❌ Error analyzing results: {str(e)}")
-#                   import traceback
-#                   traceback.print_exc()
+              except Exception as e:
+                  print(f"❌ Error analyzing results: {str(e)}")
+                  import traceback
+                  traceback.print_exc()
           
-#           if __name__ == "__main__":
-#               analyze_robot_results()
-#           PYTHON_SCRIPT
+          if __name__ == "__main__":
+              analyze_robot_results()
+          PYTHON_SCRIPT
           
-#           # รัน script วิเคราะห์ผล
-#           python analyze_results.py
+          # รัน script วิเคราะห์ผล
+          python analyze_results.py
       
-#       - name: 📝 Update GitHub Job Summary
-#         if: always()
-#         run: |
-#           # เพิ่ม Summary ใน GitHub
-#           if [ -f "test_summary.md" ]; then
-#             cat test_summary.md >> $GITHUB_STEP_SUMMARY
+      - name: 📝 Update GitHub Job Summary
+        if: always()
+        run: |
+          # เพิ่ม Summary ใน GitHub
+          if [ -f "test_summary.md" ]; then
+            cat test_summary.md >> $GITHUB_STEP_SUMMARY
             
-#             # เพิ่มข้อมูลเพิ่มเติม
-#             echo "" >> $GITHUB_STEP_SUMMARY
-#             echo "---" >> $GITHUB_STEP_SUMMARY
-#             echo "" >> $GITHUB_STEP_SUMMARY
-#             echo "### 📌 Test Information" >> $GITHUB_STEP_SUMMARY
-#             echo "" >> $GITHUB_STEP_SUMMARY
-#             echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-#             echo "- **Runner:** ${{ runner.os }}" >> $GITHUB_STEP_SUMMARY
-#             echo "- **Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-#             echo "- **Workflow:** ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
-#             echo "" >> $GITHUB_STEP_SUMMARY
-#           else
-#             echo "⚠️ No test summary available" >> $GITHUB_STEP_SUMMARY
-#           fi
+            # เพิ่มข้อมูลเพิ่มเติม
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "---" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 📌 Test Information" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Runner:** ${{ runner.os }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Workflow:** ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ No test summary available" >> $GITHUB_STEP_SUMMARY
+          fi
       
-#       - name: Set current date and time
-#         id: set-datetime
-#         run: echo "datetime=$(TZ='Asia/Bangkok' date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_OUTPUT
+      - name: Set current date and time
+        id: set-datetime
+        run: echo "datetime=$(TZ='Asia/Bangkok' date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_OUTPUT
 
-#       - name: 📁 Upload Test Results Artifact
-#         if: always()
-#         uses: actions/upload-artifact@v4
-#         with:
-#           name: Robot-Test-Results-${{ steps.set-datetime.outputs.datetime }}
-#           path: results/
-#           retention-days: 30
+      - name: 📁 Upload Test Results Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Robot-Test-Results-${{ steps.set-datetime.outputs.datetime }}
+          path: results/
+          retention-days: 30
                 
