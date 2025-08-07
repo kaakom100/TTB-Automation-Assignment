@@ -2,8 +2,7 @@
 # Page
 Resource    ${EXECDIR}/Pages/Web/LoginPageWeb.robot
 Resource    ${EXECDIR}/Pages/Web/LoginSuccessPageWeb.robot
-# Suite Setup    Open Web Browser    ${url}    ${browser}
-# Suite Teardown    Close Browser
+Suite Teardown    Close Browser
 
 *** Variables ***
 # Data Test    
@@ -43,7 +42,6 @@ Login Success
     LoginSuccessPageWeb.Validate Popup Message    expect=${_LOGIN_SUCCESS_TEXT}
     LoginSuccessPageWeb.Click Logout Button
     LoginPageWeb.Validate Popup Message    expect=${_LOGOUT_SUCCESS_TEXT}
-    Close Browser
 
 Login Username Not Found
     [Documentation]    Owner : Danai Lertkamjornwat
@@ -67,7 +65,6 @@ Login Username Not Found
     LoginPageWeb.Input Password    password=${_PASSWORD}
     LoginPageWeb.Click Login Button
     LoginPageWeb.Validate Popup Message    expect=${_USERNAME_ERROR_TEXT}
-    Close Browser
 
 Login Password Not Found
     [Documentation]    Owner : Danai Lertkamjornwat
@@ -91,7 +88,6 @@ Login Password Not Found
     LoginPageWeb.Input Password    password=${_PASSWORD_FAIL}
     LoginPageWeb.Click Login Button
     LoginPageWeb.Validate Popup Message   expect=${_PASSWORD_ERROR_TEXT}
-    Close Browser
 
 Login Password Not Found Fail
     [Documentation]    Owner : Danai Lertkamjornwat
@@ -115,6 +111,5 @@ Login Password Not Found Fail
     LoginPageWeb.Input Password    password=${_PASSWORD}
     LoginPageWeb.Click Login Button
     LoginPageWeb.Validate Popup Message   expect=${_PASSWORD_ERROR_TEXT}
-    Close Browser
 
 

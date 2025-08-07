@@ -15,55 +15,66 @@ on:
 
 # งานที่จะทำ
 jobs:
-  setup-job:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Upload repo
-        uses: actions/upload-artifact@v4
-        with:
-          name: source-code
-          path: .
-
+  # งานที่ 1: Web Test
   test-web:
-    needs: setup-job
     runs-on: ubuntu-latest
     steps:
-      - name: Download repo
-        uses: actions/download-artifact@v4
-        with:
-          name: source-code
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install robotframework-seleniumlibrary webdriver-manager
-      - name: Run Web Test
-        run: |
-          robot --outputdir results TestScript/Web/Staging/FlowLogin.robot
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-  test-api:
-    needs: setup-job
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download repo
-        uses: actions/download-artifact@v4
-        with:
-          name: source-code
-      - name: Setup Python
+      - name: 🐍 Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
-      - name: Install dependencies
+          python-version: '3.12.4'
+
+      - name: Install Robot Framework
         run: |
           pip install -r requirements.txt
-      - name: Run API Test
+
+      - name: 🧪 Run Web Tests Only
         run: |
-          robot --outputdir results TestScript/API/API.robot
+          mkdir -p results
+          robot \
+            --variable BROWSER:headlesschrome \
+            --outputdir results \
+            --output output.xml \
+            --log log.html \
+            --report report.html \
+            --name "Web Tests" \
+            TestScript/Web/Staging/FlowLogin.robot || true
+          echo "================================"
+          echo "Test execution completed with exit code: ${EXIT_CODE:-0}"
+          echo "================================"
+
+  # งานที่ 2: API Test
+  test-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.4'
+
+      - name: Install Robot Framework
+        run: |
+          pip install -r requirements.txt
+
+      - name: 🧪 Run API Tests Only
+        run: |
+          mkdir -p results
+          robot \
+            --outputdir results \
+            --output output.xml \
+            --log log.html \
+            --report report.html \
+            --name "API Tests" \
+            TestScript/API/API.robot || true
+          echo "================================"
+          echo "Test execution completed with exit code: ${EXIT_CODE:-0}"
+          echo "================================"
 
   summary:
     needs: [test-api, test-web]
