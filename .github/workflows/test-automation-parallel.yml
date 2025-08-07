@@ -244,15 +244,15 @@ jobs:
               
               # Web Tests Row
               if web_results:
-                  f.write(f"| **Web Tests** | {web_results['passed']} | {web_results['failed']} | {web_results['total']} | **{web_results['pass_rate']}%** |\n")
+                  f.write(f"| Web Tests | {web_results['passed']} | {web_results['failed']} | {web_results['total']} | {web_results['pass_rate']}% |\n")
               else:
-                  f.write("| **Web Tests** | ⏭️ | - | - | - | **N/A** |\n")
+                  f.write("| Web Tests | ⏭️ | - | - | - | **N/A** |\n")
               
               # API Tests Row
               if api_results:
-                  f.write(f"| **API Tests** | {api_results['passed']} | {api_results['failed']} | {api_results['total']} | **{api_results['pass_rate']}%** |\n")
+                  f.write(f"| API Tests | {api_results['passed']} | {api_results['failed']} | {api_results['total']} | {api_results['pass_rate']}% |\n")
               else:
-                  f.write("| **API Tests** | ⏭️ | - | - | - | **N/A** |\n")
+                  f.write("| API Tests | ⏭️ | - | - | - | **N/A** |\n")
               
               # Total Row
               f.write(f"| **TOTAL** | **{total_passed}** | **{total_failed}** | **{total_tests}** | **{overall_pass_rate}%** |\n\n")
