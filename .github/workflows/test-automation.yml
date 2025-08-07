@@ -182,12 +182,12 @@ jobs:
                       else:
                           f.write(f"| ❌ **Failed** | **0** | - | **0.00%** |\n")
 
-                      # รวมชื่อทั้งหมด (Passed + Failed)
-                      all_test_names = passed_names + failed_names  # สมมติ passed_names, failed_names เป็น list ชื่อ
-                      all_tests = "<br>".join(all_test_names) if all_test_names else "-"
-                      
-                      # แสดง Total
-                      f.write(f"| 📊 **Total** | **{total}** | {all_tests} | **100.00%** |\n\n")                  
+                      # Total (รวมชื่อทั้ง Passed/Failed)
+                      all_names = []
+                      all_names.extend(passed_names)
+                      all_names.extend([detail['name'] for detail in failed_details])
+                      total_list = "<br>".join(all_names) if all_names else "-"           
+                      f.write(f"| 📊 **Total** | **{total}** | {total_list} | **100.00%** |\n\n")                  
                   
                   print("\n✅ Summary files created successfully!")
                   
