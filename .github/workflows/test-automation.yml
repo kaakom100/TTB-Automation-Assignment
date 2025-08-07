@@ -41,254 +41,88 @@ jobs:
       - name: ติดตั้ง Robot Framework
         run: |
           pip install -r requirements.txt
-      
+
       # ขั้นตอนที่ 4: รันเทส
-      - name: รันเทส Web
-        run: |
-          # สร้างโฟลเดอร์เก็บผล
-          mkdir -p results
-          
-          # รันเทสตรงๆ ที่ไฟล์ FlowLogin.robot
-          robot --outputdir results TestScript/Web/Staging/FlowLogin.robot || true
-      
-      # ขั้นตอนที่ 5: รันเทส
-      - name: 🧪 Run Robot Framework Tests
-        id: robot-test
+      - name: 🧪 Run Web Tests Only
         run: |
           mkdir -p results
           
-          # รันเทสและเก็บ exit code
+          # รันเฉพาะ Web Tests - มี 3 วิธีให้เลือก:
+          
+          # วิธีที่ 1: รันเฉพาะโฟลเดอร์ Web
           robot \
             --variable BROWSER:headlesschrome \
             --outputdir results \
             --output output.xml \
             --log log.html \
             --report report.html \
-            TestScript/ || ROBOT_EXIT_CODE=$?
+            --name "Web Tests" \
+            TestScript/Web/Staging/FlowLogin.robot || true
           
-          # ตรวจสอบว่ารันสำเร็จหรือไม่
-          if [ ${ROBOT_EXIT_CODE:-0} -eq 0 ]; then
-            echo "✅ All tests passed!"
-            echo "test_status=success" >> $GITHUB_OUTPUT
-          else
-            echo "❌ Some tests failed!"
-            echo "test_status=failure" >> $GITHUB_OUTPUT
-          fi
+          # หรือ วิธีที่ 2: รันเฉพาะไฟล์ที่ต้องการ
+          # robot \
+          #   --variable BROWSER:headlesschrome \
+          #   --outputdir results \
+          #   TestScript/Web/Staging/FlowLogin.robot || true
           
-          # แสดงผลสรุป
-          echo "========================================="
-          echo "📊 TEST EXECUTION SUMMARY"
-          echo "========================================="
+          # หรือ วิธีที่ 3: ใช้ tags (ถ้ามี tag ในไฟล์ robot)
+          # robot \
+          #   --variable BROWSER:headlesschrome \
+          #   --outputdir results \
+          #   --include web \
+          #   --exclude api \
+          #   --exclude mobile \
+          #   TestScript/ || true
       
-      # ขั้นตอนที่ 6: วิเคราะห์ผลและแสดงสถิติ
-      - name: 📊 Analyze Test Results
+      - name: 📊 Analyze Web Test Results
         if: always()
         run: |
-          # สร้าง Python script เพื่ออ่านผล
-          cat > analyze_results.py << 'EOF'
+          if [ -f "results/output.xml" ]; then
+            python << 'EOF'
           import xml.etree.ElementTree as ET
-          import os
-          import sys
           
-          # อ่านไฟล์ output.xml
-          xml_file = 'results/output.xml'
-          if not os.path.exists(xml_file):
-              print("❌ ไม่พบไฟล์ผลการทดสอบ")
-              sys.exit(1)
-          
-          tree = ET.parse(xml_file)
+          tree = ET.parse('results/output.xml')
           root = tree.getroot()
-          
-          # หาสถิติ
           stats = root.find('.//statistics/total/stat')
-          if stats is not None:
+          
+          if stats:
               passed = int(stats.get('pass', 0))
               failed = int(stats.get('fail', 0))
-              skipped = int(stats.get('skip', 0))
-              total = passed + failed + skipped
-              
-              # คำนวณเปอร์เซ็นต์
+              total = passed + failed
               pass_rate = (passed / total * 100) if total > 0 else 0
               
-              # แสดงผลแบบสวยงาม
               print("\n" + "="*50)
-              print("📊 TEST RESULTS SUMMARY")
+              print("🌐 WEB TEST RESULTS")
               print("="*50)
               print(f"✅ Passed:  {passed:3d} tests")
               print(f"❌ Failed:  {failed:3d} tests")
-              print(f"⏭️  Skipped: {skipped:3d} tests")
-              print("-"*50)
               print(f"📊 Total:   {total:3d} tests")
               print(f"📈 Pass Rate: {pass_rate:.1f}%")
               print("="*50)
               
-              # สร้างสถานะ emoji
-              if pass_rate == 100:
-                  status = "🎉 PERFECT! All tests passed!"
-              elif pass_rate >= 80:
-                  status = "✅ GOOD: Most tests passed"
-              elif pass_rate >= 60:
-                  status = "⚠️ WARNING: Some tests failed"
-              else:
-                  status = "❌ CRITICAL: Many tests failed"
-              
-              print(f"\n{status}\n")
-              
-              # แสดงรายการ test ที่ fail (ถ้ามี)
-              if failed > 0:
-                  print("\n❌ FAILED TESTS:")
-                  print("-"*50)
-                  for test in root.findall('.//test[@status="FAIL"]'):
-                      name = test.get('name', 'Unknown')
-                      print(f"  ❌ {name}")
-                      # แสดง error message ถ้ามี
-                      msg = test.find('.//msg[@level="FAIL"]')
-                      if msg is not None and msg.text:
-                          error_text = msg.text[:100] + "..." if len(msg.text) > 100 else msg.text
-                          print(f"     Error: {error_text}")
-              
-              # สร้างไฟล์ summary สำหรับ GitHub
-              with open(os.environ.get('GITHUB_STEP_SUMMARY', 'summary.md'), 'a') as f:
-                  f.write("# 🤖 Robot Framework Test Results\n\n")
-                  f.write("## 📊 Summary\n\n")
-                  f.write("| Metric | Count | Percentage |\n")
-                  f.write("|--------|-------|------------|\n")
-                  f.write(f"| ✅ **Passed** | **{passed}** | {(passed/total*100):.1f}% |\n")
-                  f.write(f"| ❌ **Failed** | **{failed}** | {(failed/total*100):.1f}% |\n")
-                  f.write(f"| ⏭️ **Skipped** | **{skipped}** | {(skipped/total*100):.1f}% |\n")
-                  f.write(f"| 📊 **Total** | **{total}** | 100% |\n\n")
-                  
-                  # Badge
-                  color = 'green' if pass_rate >= 80 else 'yellow' if pass_rate >= 60 else 'red'
-                  f.write(f"![Pass Rate](https://img.shields.io/badge/Pass%20Rate-{pass_rate:.1f}%25-{color})\n\n")
-                  
-                  if failed > 0:
-                      f.write("## ❌ Failed Tests\n\n")
-                      for test in root.findall('.//test[@status="FAIL"]'):
-                          name = test.get('name', 'Unknown')
-                          f.write(f"- {name}\n")
-          
-          # บันทึกสถิติเป็น environment variable
-          print(f"::set-output name=total_tests::{total}")
-          print(f"::set-output name=passed_tests::{passed}")
-          print(f"::set-output name=failed_tests::{failed}")
-          print(f"::set-output name=pass_rate::{pass_rate:.1f}")
+              # สร้าง GitHub Summary
+              with open('summary.md', 'w') as f:
+                  f.write("# 🌐 Web Test Results\n\n")
+                  f.write("| Type | Count |\n")
+                  f.write("|------|-------|\n")
+                  f.write(f"| ✅ Passed | **{passed}** |\n")
+                  f.write(f"| ❌ Failed | **{failed}** |\n")
+                  f.write(f"| 📊 Total | **{total}** |\n")
+                  f.write(f"| 📈 Pass Rate | **{pass_rate:.1f}%** |\n")
           EOF
-          
-          # รัน script
-          python analyze_results.py
+            
+            # แสดงใน GitHub Summary
+            if [ -f "summary.md" ]; then
+              cat summary.md >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "⚠️ No test results found"
+          fi
       
-      # ขั้นตอนที่ 7: สร้าง Test Report Badge
-      - name: 🏷️ Create Test Badge
-        if: always()
-        run: |
-          # อ่านผลจาก output.xml และสร้าง badge
-          python << 'EOF'
-          import xml.etree.ElementTree as ET
-          import json
-          
-          try:
-              tree = ET.parse('results/output.xml')
-              root = tree.getroot()
-              stats = root.find('.//statistics/total/stat')
-              
-              if stats:
-                  passed = int(stats.get('pass', 0))
-                  failed = int(stats.get('fail', 0))
-                  total = passed + failed
-                  
-                  # สร้าง badge data
-                  badge_data = {
-                      "schemaVersion": 1,
-                      "label": "Tests",
-                      "message": f"{passed}/{total} passed",
-                      "color": "green" if failed == 0 else "yellow" if failed <= 2 else "red"
-                  }
-                  
-                  # บันทึกเป็นไฟล์
-                  with open('results/badge.json', 'w') as f:
-                      json.dump(badge_data, f)
-                  
-                  print(f"📊 Badge created: {passed}/{total} tests passed")
-          except:
-              print("⚠️ Could not create badge")
-          EOF
-      
-      # ขั้นตอนที่ 8: แสดงผลใน Job Summary
-      - name: 📝 Update Job Summary
-        if: always()
-        run: |
-          echo "## 🔗 Quick Links" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- 📊 [Download Full Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
-          echo "- 📝 [View Workflow File](https://github.com/${{ github.repository }}/blob/${{ github.sha }}/.github/workflows/web-test-simple.yml)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Run by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-      
-      # ขั้นตอนที่ 9: Upload Artifacts
-      - name: 📁 Upload Test Results
+      - name: 📁 Upload Web Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ github.run_number }}
-          path: |
-            results/
+          name: web-test-results-${{ github.run_number }}
+          path: results/
           retention-days: 30
-      
-      # ขั้นตอนที่ 10: Comment on Commit (ถ้าเป็น push)
-      - name: 💬 Comment Test Results
-        if: always() && github.event_name == 'push'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            
-            // อ่านผลจาก summary
-            let comment = '## 🤖 Robot Framework Test Results\n\n';
-            
-            try {
-              // พยายามอ่านไฟล์ผล
-              const xml = fs.readFileSync('results/output.xml', 'utf8');
-              
-              // หาจำนวน pass/fail จาก XML (แบบง่าย)
-              const passMatch = xml.match(/pass="(\d+)"/);
-              const failMatch = xml.match(/fail="(\d+)"/);
-              
-              if (passMatch && failMatch) {
-                const passed = parseInt(passMatch[1]);
-                const failed = parseInt(failMatch[1]);
-                const total = passed + failed;
-                const passRate = total > 0 ? ((passed / total) * 100).toFixed(1) : 0;
-                
-                // สร้าง emoji ตามผล
-                const statusEmoji = failed === 0 ? '✅' : '❌';
-                const status = failed === 0 ? 'All tests passed!' : `${failed} test(s) failed`;
-                
-                comment += `${statusEmoji} **Status:** ${status}\n\n`;
-                comment += `📊 **Results:** ${passed}/${total} tests passed (${passRate}%)\n\n`;
-                
-                // สร้างแถบความคืบหน้า
-                const progressBar = '█'.repeat(Math.floor(passRate/10)) + '░'.repeat(10 - Math.floor(passRate/10));
-                comment += `**Pass Rate:** [${progressBar}] ${passRate}%\n\n`;
-                
-                comment += `🔗 [View Full Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
-              }
-            } catch (e) {
-              comment += '⚠️ Could not parse test results\n';
-            }
-            
-            // Comment on commit
-            try {
-              await github.rest.repos.createCommitComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                commit_sha: context.sha,
-                body: comment
-              });
-            } catch (e) {
-              console.log('Could not create commit comment:', e.message);
-            }
