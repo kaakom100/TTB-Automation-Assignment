@@ -153,6 +153,22 @@ jobs:
 
                   print("Passed tests =", passed_tests)
                   print("Failed tests =", failed_tests)
+
+                  # passed_tests = []
+                  # failed_tests = []
+                  # for test in root.findall('.//test'):
+                  #     test_name = test.get('name', 'Unknown')
+                  #     test_status = test.get('status', 'UNKNOWN')
+                  #     if test_status == 'PASS':
+                  #         passed_tests.append(test_name)
+                  #     elif test_status == 'FAIL':
+                  #         failed_tests.append(test_name)
+                  #         msg = test.find('.//msg[@level="FAIL"]')
+                  #         error_msg = msg.text if msg is not None and msg.text else "No error message"
+                  #         failed_tests.append(f"  └─ Error: {error_msg[:100]}")
+
+                  # print("Passed tests =", passed_tests)
+                  # print("Failed tests =", failed_tests)
                   
                   # passed_tests = []
                   # failed_tests = []
@@ -165,42 +181,42 @@ jobs:
                   #         passed_tests.append(test_name)
                   #     elif test_status == 'FAIL':
                   #         failed_tests.append(test_name)
-                  #         # หา error message
+                  #         หา error message
                   #         msg = test.find('.//msg[@level="FAIL"]')
                   #         error_msg = msg.text if msg is not None and msg.text else "No error message"
                   #         failed_tests.append(f"  └─ Error: {error_msg[:100]}")
                   
                   # แสดง Passed Tests
-                  if passed_tests:
-                      print(f"\n✅ PASSED TESTS ({len([t for t in passed_tests if not t.startswith('  ')])} tests):")
-                      print("-"*40)
-                      for test in passed_tests[:10]:  # แสดงแค่ 10 อันแรก
-                          print(f"  ✓ {test}")
-                      if len(passed_tests) > 10:
-                          print(f"  ... and {len(passed_tests)-10} more")
+                  # if passed_tests:
+                  #     print(f"\n✅ PASSED TESTS ({len([t for t in passed_tests if not t.startswith('  ')])} tests):")
+                  #     print("-"*40)
+                  #     for test in passed_tests[:10]:  # แสดงแค่ 10 อันแรก
+                  #         print(f"  ✓ {test}")
+                  #     if len(passed_tests) > 10:
+                  #         print(f"  ... and {len(passed_tests)-10} more")
                   
                   # แสดง Failed Tests
-                  if failed_tests:
-                      print(f"\n❌ FAILED TESTS ({failed} tests):")
-                      print("-"*40)
-                      for test in failed_tests:
-                          if test.startswith('  '):
-                              print(test)
-                          else:
-                              print(f"  ✗ {test}")
+                  # if failed_tests:
+                  #     print(f"\n❌ FAILED TESTS ({failed} tests):")
+                  #     print("-"*40)
+                  #     for test in failed_tests:
+                  #         if test.startswith('  '):
+                  #             print(test)
+                  #         else:
+                  #             print(f"  ✗ {test}")
                   
                   # สร้างไฟล์ JSON สำหรับ Badge
-                  badge_data = {
-                      "passed": passed,
-                      "failed": failed,
-                      "skipped": skipped,
-                      "total": total,
-                      "pass_rate": round(pass_percentage, 2),
-                      "status": status_text
-                  }
+                  # badge_data = {
+                  #     "passed": passed,
+                  #     "failed": failed,
+                  #     "skipped": skipped,
+                  #     "total": total,
+                  #     "pass_rate": round(pass_percentage, 2),
+                  #     "status": status_text
+                  # }
                   
-                  with open('results/test_summary.json', 'w') as f:
-                      json.dump(badge_data, f, indent=2)
+                  # with open('results/test_summary.json', 'w') as f:
+                  #     json.dump(badge_data, f, indent=2)
                   
                   # สร้าง Markdown สำหรับ GitHub Summary
                   with open('test_summary.md', 'w', encoding='utf-8') as f:
@@ -209,28 +225,23 @@ jobs:
                       f.write("| Status | Count | Test Names | Percentage |\n")
                       f.write("|--------|-------|------------|------------|\n")
                       
-                      # รายชื่อ test ที่ผ่าน
                       passed_list = "<br>".join(passed_tests) if passed_tests else "-"
                       f.write(f"| ✅ **Passed** | **{passed}** | {passed_list} | **{pass_percentage:.2f}%** |\n")
                       
                       # รายชื่อ test ที่ไม่ผ่าน + error
                       if failed > 0:
-                          # ดึงเป็นคู่: ชื่อ test, error (เนื่องจาก failed_tests = [name, error, name, error, ...])
                           failed_pairs = []
                           for i in range(0, len(failed_tests), 2):
                               name = failed_tests[i]
                               if i + 1 < len(failed_tests):
-                                  error = failed_tests[i + 1][10:]  # ตัด '  └─ Error: ' ข้างหน้า
+                                  error = failed_tests[i + 1][10:]
                               else:
                                   error = ""
                               failed_pairs.append(f"{name} <br><span style='color:#b33'>• {error}</span>")
                           failed_list = "<br><br>".join(failed_pairs)
                           f.write(f"| ❌ **Failed** | **{failed}** | {failed_list} | **{fail_percentage:.2f}%** |\n")
-
-                      # รวมทั้งหมด
+                      
                       f.write(f"| 📊 **Total** | **{total}** | - | **100.00%** |\n\n")
-                  
-                  f.write(f"| 📊 **Total** | **{total}** | - | **100.00%** |\n\n")
                   
                   print("\n✅ Summary files created successfully!")
                   
