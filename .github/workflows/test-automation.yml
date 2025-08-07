@@ -207,10 +207,10 @@ jobs:
           
           if __name__ == "__main__":
               analyze_robot_results()
-          # PYTHON_SCRIPT
+          PYTHON_SCRIPT
           
           # # รัน script วิเคราะห์ผล
-          # python analyze_results.py
+          python analyze_results.py
 
       - name: 🐞 List files after test summary
         run: |
