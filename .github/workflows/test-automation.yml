@@ -192,28 +192,25 @@ jobs:
                       
                       # ตารางสรุป
                       f.write("## 📊 Summary\n\n")
-                      f.write("| Status | Count | Percentage | Progress Bar |\n")
-                      f.write("|--------|-------|------------|-------------|\n")
+                      f.write("| Status | Count | Percentage |\n")
+                      f.write("|--------|-------|------------|\n")
                       
                       # Progress bar สำหรับ Pass
-                      pass_bar = '🟩' * int(pass_percentage/10) + '⬜' * (10-int(pass_percentage/10))
-                      f.write(f"| ✅ **Passed** | **{passed}** | **{pass_percentage:.2f}%** | {pass_bar} |\n")
+                      f.write(f"| ✅ **Passed** | **{passed}** | **{pass_percentage:.2f}%** |\n")
                       
                       # Progress bar สำหรับ Fail
-                      fail_bar = '🟥' * int(fail_percentage/10) + '⬜' * (10-int(fail_percentage/10))
-                      f.write(f"| ❌ **Failed** | **{failed}** | **{fail_percentage:.2f}%** | {fail_bar} |\n")
+                      f.write(f"| ❌ **Failed** | **{failed}** | **{fail_percentage:.2f}%** |\n")
                       
                       if skipped > 0:
                           skip_percentage = (skipped / total * 100)
-                          skip_bar = '🟨' * int(skip_percentage/10) + '⬜' * (10-int(skip_percentage/10))
-                          f.write(f"| ⏭️ **Skipped** | **{skipped}** | **{skip_percentage:.2f}%** | {skip_bar} |\n")
+                          f.write(f"| ⏭️ **Skipped** | **{skipped}** | **{skip_percentage:.2f}%** |\n")
                       
-                      f.write(f"| 📊 **Total** | **{total}** | **100.00%** | 🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵 |\n\n")
+                      f.write(f"| 📊 **Total** | **{total}** | **100.00%** |\n\n")
                       
-                      # Badge
-                      color = 'brightgreen' if pass_percentage >= 80 else 'yellow' if pass_percentage >= 60 else 'red'
-                      f.write(f"![Tests](https://img.shields.io/badge/Tests-{passed}%20passed%2C%20{failed}%20failed-{color})\n")
-                      f.write(f"![Pass Rate](https://img.shields.io/badge/Pass%20Rate-{pass_percentage:.1f}%25-{color})\n\n")
+                      # # Badge
+                      # color = 'brightgreen' if pass_percentage >= 80 else 'yellow' if pass_percentage >= 60 else 'red'
+                      # f.write(f"![Tests](https://img.shields.io/badge/Tests-{passed}%20passed%2C%20{failed}%20failed-{color})\n")
+                      # f.write(f"![Pass Rate](https://img.shields.io/badge/Pass%20Rate-{pass_percentage:.1f}%25-{color})\n\n")
                       
                       # Test Details
                       if failed > 0:
@@ -255,33 +252,33 @@ jobs:
           # รัน script วิเคราะห์ผล
           python analyze_results.py
 
-      - name: 📝 Update GitHub Job Summary
-        if: always()
-        run: |
-          # เพิ่ม Summary ใน GitHub
-          if [ -f "test_summary.md" ]; then
-            cat test_summary.md >> $GITHUB_STEP_SUMMARY
+      # - name: 📝 Update GitHub Job Summary
+      #   if: always()
+      #   run: |
+      #     # เพิ่ม Summary ใน GitHub
+      #     if [ -f "test_summary.md" ]; then
+      #       cat test_summary.md >> $GITHUB_STEP_SUMMARY
             
-            # เพิ่มข้อมูลเพิ่มเติม
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "---" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "### 📌 Test Information" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- **Run Number:** #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-            echo "- **Runner:** ${{ runner.os }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-            echo "- **Workflow:** ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "### 🔗 Quick Links" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- [📥 Download Full Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
-            echo "- [📊 View Test Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs)" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ No test summary available" >> $GITHUB_STEP_SUMMARY
-          fi
+      #       # เพิ่มข้อมูลเพิ่มเติม
+      #       echo "" >> $GITHUB_STEP_SUMMARY
+      #       echo "---" >> $GITHUB_STEP_SUMMARY
+      #       echo "" >> $GITHUB_STEP_SUMMARY
+      #       echo "### 📌 Test Information" >> $GITHUB_STEP_SUMMARY
+      #       echo "" >> $GITHUB_STEP_SUMMARY
+      #       echo "- **Run Number:** #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+      #       echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+      #       echo "- **Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+      #       echo "- **Runner:** ${{ runner.os }}" >> $GITHUB_STEP_SUMMARY
+      #       echo "- **Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+      #       echo "- **Workflow:** ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+      #       echo "" >> $GITHUB_STEP_SUMMARY
+      #       echo "### 🔗 Quick Links" >> $GITHUB_STEP_SUMMARY
+      #       echo "" >> $GITHUB_STEP_SUMMARY
+      #       echo "- [📥 Download Full Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+      #       echo "- [📊 View Test Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs)" >> $GITHUB_STEP_SUMMARY
+      #     else
+      #       echo "⚠️ No test summary available" >> $GITHUB_STEP_SUMMARY
+      #     fi
 
       # - name: 📝 Update GitHub Job Summary
       #   if: always()
