@@ -101,42 +101,42 @@ jobs:
                   pass_percentage = (passed / total * 100) if total > 0 else 0
                   fail_percentage = (failed / total * 100) if total > 0 else 0
                   
-                  # # แสดงผลใน Console
-                  # print("\n" + "="*60)
-                  # print("📊 WEB TEST EXECUTION SUMMARY")
-                  # print("="*60)
-                  # print(f"✅ PASSED:  {passed:3d} tests ({pass_percentage:6.2f}%)")
-                  # print(f"❌ FAILED:  {failed:3d} tests ({fail_percentage:6.2f}%)")
-                  # if skipped > 0:
-                  #     skip_percentage = (skipped / total * 100)
-                  #     print(f"⏭️  SKIPPED: {skipped:3d} tests ({skip_percentage:6.2f}%)")
-                  # print("-"*60)
-                  # print(f"📊 TOTAL:   {total:3d} tests (100.00%)")
-                  # print(f"📈 PASS RATE: {pass_percentage:.2f}%")
-                  # print("="*60)
+                  # แสดงผลใน Console
+                  print("\n" + "="*60)
+                  print("📊 WEB TEST EXECUTION SUMMARY")
+                  print("="*60)
+                  print(f"✅ PASSED:  {passed:3d} tests ({pass_percentage:6.2f}%)")
+                  print(f"❌ FAILED:  {failed:3d} tests ({fail_percentage:6.2f}%)")
+                  if skipped > 0:
+                      skip_percentage = (skipped / total * 100)
+                      print(f"⏭️  SKIPPED: {skipped:3d} tests ({skip_percentage:6.2f}%)")
+                  print("-"*60)
+                  print(f"📊 TOTAL:   {total:3d} tests (100.00%)")
+                  print(f"📈 PASS RATE: {pass_percentage:.2f}%")
+                  print("="*60)
                   
-                  # # สถานะโดยรวม
-                  # if pass_percentage == 100:
-                  #     print("\n🎉 EXCELLENT! All tests passed!")
-                  #     status_emoji = "🎉"
-                  #     status_text = "Perfect"
-                  # elif pass_percentage >= 80:
-                  #     print("\n✅ GOOD! Most tests passed")
-                  #     status_emoji = "✅"
-                  #     status_text = "Good"
-                  # elif pass_percentage >= 60:
-                  #     print("\n⚠️  WARNING! Several tests failed")
-                  #     status_emoji = "⚠️"
-                  #     status_text = "Warning"
-                  # else:
-                  #     print("\n❌ CRITICAL! Many tests failed")
-                  #     status_emoji = "❌"
-                  #     status_text = "Critical"
+                  # สถานะโดยรวม
+                  if pass_percentage == 100:
+                      print("\n🎉 EXCELLENT! All tests passed!")
+                      status_emoji = "🎉"
+                      status_text = "Perfect"
+                  elif pass_percentage >= 80:
+                      print("\n✅ GOOD! Most tests passed")
+                      status_emoji = "✅"
+                      status_text = "Good"
+                  elif pass_percentage >= 60:
+                      print("\n⚠️  WARNING! Several tests failed")
+                      status_emoji = "⚠️"
+                      status_text = "Warning"
+                  else:
+                      print("\n❌ CRITICAL! Many tests failed")
+                      status_emoji = "❌"
+                      status_text = "Critical"
                   
-                  # # รายการ Test ที่ผ่าน
-                  # print("\n" + "="*60)
-                  # print("📋 TEST DETAILS")
-                  # print("="*60)
+                  # รายการ Test ที่ผ่าน
+                  print("\n" + "="*60)
+                  print("📋 TEST DETAILS")
+                  print("="*60)
 
                   passed_tests = []
                   failed_tests = []
