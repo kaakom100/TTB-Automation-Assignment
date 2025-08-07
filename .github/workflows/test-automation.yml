@@ -186,14 +186,15 @@ jobs:
                           f.write(f"| ❌ **Failed** | **0** | - | **0.00%** |\n")
 
                       # Total (รวมชื่อทั้ง Passed/Failed พร้อมไอคอน)
-                      total_md = ""
-                      if passed_tests:
-                          total_md += "**✅ Passed:**<br>" + "<br>".join(passed_tests) + "<br>"
-                      if failed_tests:
-                          total_md += "<br>**❌ Failed:**<br>" + "<br>".join(failed_tests)
-                      f.write(f"| 📊 Total | **{total}** | {total_md} | **100.00%** |\n\n")
+                      all_names = []
+                      if passed_details:
+                          all_names += [f"✅ {t['name']}" for t in passed_details]
+                      if failed_details:
+                          all_names += [f"❌ {t['name']}" for t in failed_details]
+                      all_names_md = "<br>".join(all_names) if all_names else "-"
+                      f.write(f"| 📊 **Total** | **{total}** | {all_names_md} | **100.00%** |\n\n")
                       # แล้วเอา total_md ไปใส่ใน markdown table
-                      f.write(f"| 📊 Total | **{total}** | {total_md} | **100.00%** |\n\n")
+                      #f.write(f"| 📊 Total | **{total}** | {total_md} | **100.00%** |\n\n")
                       # all_names = (
                       #     [f"✅ {d['name']}" for d in passed_details] +
                       #     [f"❌ {d['name']}" for d in failed_details]
