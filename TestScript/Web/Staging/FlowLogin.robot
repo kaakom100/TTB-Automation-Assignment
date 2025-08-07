@@ -2,6 +2,7 @@
 # Page
 Resource    ${EXECDIR}/Pages/Web/LoginPageWeb.robot
 Resource    ${EXECDIR}/Pages/Web/LoginSuccessPageWeb.robot
+Suite Setup    Open Web Browser    ${url}    ${browser}
 Suite Teardown    Close Browser
 
 *** Variables ***
@@ -35,7 +36,7 @@ Login Success
     ...           |    ต้องเข้าสู่ระบบได้ถูกต้อง
     ...           ==> 
     [Tags]    success
-    LoginPageWeb.Open Web Browser    url=${_URL}    browser=${_BROWSER}
+    # LoginPageWeb.Open Web Browser    url=${_URL}    browser=${_BROWSER}
     LoginPageWeb.Input Username    username=${_USERNAME}
     LoginPageWeb.Input Password    password=${_PASSWORD}
     LoginPageWeb.Click Login Button
@@ -60,7 +61,7 @@ Login Username Not Found
     ...           |    ต้องเข้าสู่ระบบได้ถูกต้อง
     ...           ==> 
     [Tags]    fail
-    LoginPageWeb.Open Web Browser    url=${_URL}    browser=${_BROWSER}
+    # LoginPageWeb.Open Web Browser    url=${_URL}    browser=${_BROWSER}
     LoginPageWeb.Input Username    username=${_USERNAME_FAIL}
     LoginPageWeb.Input Password    password=${_PASSWORD}
     LoginPageWeb.Click Login Button
@@ -83,7 +84,7 @@ Login Password Not Found
     ...           |    ต้องเข้าสู่ระบบได้ถูกต้อง
     ...           ==> 
     [Tags]    fail
-    LoginPageWeb.Open Web Browser    url=${_URL}    browser=${_BROWSER}
+    # LoginPageWeb.Open Web Browser    url=${_URL}    browser=${_BROWSER}
     LoginPageWeb.Input Username    username=${_USERNAME}
     LoginPageWeb.Input Password    password=${_PASSWORD_FAIL}
     LoginPageWeb.Click Login Button
@@ -106,7 +107,7 @@ Login Password Not Found Fail
     ...           |    ต้องเข้าสู่ระบบได้ถูกต้อง
     ...           ==> 
     [Tags]    fail
-    LoginPageWeb.Open Web Browser    url=${_URL}    browser=${_BROWSER}
+    # LoginPageWeb.Open Web Browser    url=${_URL}    browser=${_BROWSER}
     LoginPageWeb.Input Username    username=${_USERNAME}
     LoginPageWeb.Input Password    password=${_PASSWORD}
     LoginPageWeb.Click Login Button
