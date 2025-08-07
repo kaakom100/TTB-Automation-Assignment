@@ -140,7 +140,7 @@ jobs:
 
                   passed_tests = []
                   failed_tests = []
-                  for test in root.findall('.//test'):
+                  for test in root.iter('test'):
                       test_name = test.get('name', 'Unknown')
                       test_status = test.get('status', 'UNKNOWN')
                       if test_status == 'PASS':
