@@ -18,58 +18,45 @@ jobs:
   setup-job:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Setup code & Python
         uses: actions/checkout@v4
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.4'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
 
   test-api:
     needs: setup-job
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Dependencies
-        run: pip install -r requirements.txt
-      - name: Run API Tests
+      - name: Copy repo from setup
+        uses: actions/checkout@v4
+      - name: Run API Test
         run: |
           mkdir -p results
           robot --outputdir results TestScript/API/API.robot
-      - name: Upload API Results
-        uses: actions/upload-artifact@v4
-        with:
-          name: results-api
-          path: results/
 
   test-web:
     needs: setup-job
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Dependencies
-        run: pip install -r requirements.txt
-      - name: Run Web Tests
+      - name: Copy repo from setup
+        uses: actions/checkout@v4
+      - name: Run Web Test
         run: |
           mkdir -p results
           robot --outputdir results TestScript/Web/Staging/FlowLogin.robot
-      - name: Upload Web Results
-        uses: actions/upload-artifact@v4
-        with:
-          name: results-web
-          path: results/
 
   summary:
     needs: [test-api, test-web]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: all-results/
-      - name: Show all result files
-        run: ls -R all-results/
-      # ตัวอย่าง: สมมติว่าใช้ Python summary script
-      - name: Generate & Print Test Summary
-        run: |
-          python scripts/summary.py
+      - name: Print summary
+        run: echo "Summary step"
+
       
       # ============================================
       # STEP 3: Generate Test Report
