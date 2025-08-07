@@ -116,13 +116,16 @@ jobs:
                   print("="*60)
 
                   # เก็บรายชื่อ Test
-                  passed_tests = []
+                  passed_details = []
                   failed_details = []
+                  passed_tests = []  # เอาไว้ใช้โชว์ row passed เฉยๆ
+
                   for suite in root.findall('.//suite'):
                       for test in suite.findall('.//test'):
                           name = test.get('name', 'Unknown')
                           status = test.find('./status').get('status')
                           if status == 'PASS':
+                              passed_details.append({'name': name, 'error': ''})
                               passed_tests.append(name)
                           elif status == 'FAIL':
                               msg_node = test.find('./status')
