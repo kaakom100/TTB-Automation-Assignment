@@ -193,22 +193,26 @@ jobs:
                       f.write("| Status | Count | Test Names | Percentage |\n")
                       f.write("|--------|-------|------------|------------|\n")
                       
-                      # Test ที่ผ่าน
+                      # รายชื่อ test ที่ผ่าน
                       passed_list = "<br>".join(passed_tests) if passed_tests else "-"
                       f.write(f"| ✅ **Passed** | **{passed}** | {passed_list} | **{pass_percentage:.2f}%** |\n")
                       
-                      # Test ที่ไม่ผ่าน (แค่ชื่อ ถ้าต้องการ error เพิ่มเติมก็บอกได้)
-                      failed_list = ""
+                      # รายชื่อ test ที่ไม่ผ่าน + error
                       if failed > 0:
-                          # เอาแต่ชื่อ (ไม่เอาข้อความ Error) กรณี failed_tests มีชื่อ+error สลับกัน
-                          failed_names = [failed_tests[i] for i in range(0, len(failed_tests), 2)]
-                          failed_list = "<br>".join(failed_names)
+                          # ดึงเป็นคู่: ชื่อ test, error (เนื่องจาก failed_tests = [name, error, name, error, ...])
+                          failed_pairs = []
+                          for i in range(0, len(failed_tests), 2):
+                              name = failed_tests[i]
+                              if i + 1 < len(failed_tests):
+                                  error = failed_tests[i + 1][10:]  # ตัด '  └─ Error: ' ข้างหน้า
+                              else:
+                                  error = ""
+                              failed_pairs.append(f"{name} <br><span style='color:#b33'>• {error}</span>")
+                          failed_list = "<br><br>".join(failed_pairs)
                           f.write(f"| ❌ **Failed** | **{failed}** | {failed_list} | **{fail_percentage:.2f}%** |\n")
-                      
-                      # ถ้ามี Skipped (ไม่บ่อย)
-                      if skipped > 0:
-                          skip_percentage = (skipped / total * 100)
-                          f.write(f"| ⏭️ **Skipped** | **{skipped}** | - | **{skip_percentage:.2f}%** |\n")
+
+                      # รวมทั้งหมด
+                      f.write(f"| 📊 **Total** | **{total}** | - | **100.00%** |\n\n")
                   
                   f.write(f"| 📊 **Total** | **{total}** | - | **100.00%** |\n\n")
                   # with open('test_summary.md', 'w') as f:
