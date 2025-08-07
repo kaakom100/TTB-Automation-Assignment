@@ -1,0 +1,60 @@
+# ===============================================
+# ไฟล์นี้คือตัวที่จะรันเทสให้เราอัตโนมัติ
+# ===============================================
+
+# ชื่อที่จะแสดงใน GitHub
+name: Web Test Auto Run
+
+# ===============================================
+# กำหนดว่าจะรันเมื่อไหร่
+# ===============================================
+on:
+  # รันเมื่อ push code ไปที่ branch main
+  push:
+    branches: [ main ]
+  
+  # รันเมื่อกดปุ่มรันเองใน GitHub
+  workflow_dispatch:
+
+# ===============================================
+# งานที่จะทำ
+# ===============================================
+jobs:
+  # ชื่องาน: test-web
+  test-web:
+    # ใช้คอมพิวเตอร์ Ubuntu (Linux) ของ GitHub
+    runs-on: ubuntu-latest
+    
+    # ขั้นตอนการทำงาน
+    steps:
+      # ขั้นตอนที่ 1: ดึง code จาก GitHub
+      - name: ดึง code มา
+        uses: actions/checkout@v3
+      
+      # ขั้นตอนที่ 2: ติดตั้ง Python
+      - name: ติดตั้ง Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.4'
+      
+      # ขั้นตอนที่ 3: ติดตั้ง Robot Framework
+      - name: ติดตั้ง Robot Framework
+        run: |
+          pip install -r requirements.txt
+      
+      # ขั้นตอนที่ 4: รันเทส
+      - name: รันเทส Web
+        run: |
+          # สร้างโฟลเดอร์เก็บผล
+          mkdir results
+          
+          # รันเทส
+          robot --outputdir results TestScript/Web/ || true
+      
+      # ขั้นตอนที่ 5: เก็บผลไว้ดู
+      - name: เก็บผลการทดสอบ
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: results/
