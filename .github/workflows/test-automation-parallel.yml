@@ -20,32 +20,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-      - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install robotframework-seleniumlibrary
-          pip install webdriver-manager
       - name: Upload repo
         uses: actions/upload-artifact@v4
         with:
           name: source-code
           path: .
-
-  test-api:
-    needs: setup-job
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download repo
-        uses: actions/download-artifact@v4
-        with:
-          name: source-code
-      - name: Run API Test
-        run: |
-          robot --outputdir results TestScript/API/API.robot
 
   test-web:
     needs: setup-job
@@ -55,11 +34,36 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: source-code
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install robotframework-seleniumlibrary webdriver-manager
       - name: Run Web Test
         run: |
-          robot --variable BROWSER:headlesschrome \
-                --variable CHROME_OPTIONS:"add_argument(--headless),add_argument(--no-sandbox),add_argument(--disable-dev-shm-usage)" \
-                --outputdir results TestScript/Web/Staging/FlowLogin.robot
+          robot --outputdir results TestScript/Web/Staging/FlowLogin.robot
+
+  test-api:
+    needs: setup-job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download repo
+        uses: actions/download-artifact@v4
+        with:
+          name: source-code
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      - name: Run API Test
+        run: |
+          robot --outputdir results TestScript/API/API.robot
 
   summary:
     needs: [test-api, test-web]
